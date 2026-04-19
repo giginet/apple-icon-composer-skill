@@ -8,15 +8,17 @@ From any Claude Code session:
 
 ```
 /plugin marketplace add giginet/icon-composer-mcp
-/plugin install icon-composer@giginet
+/plugin install icon-composer@icon-composer-dev
 ```
 
-Local development:
+Local development (point the marketplace at a checkout instead of GitHub):
 
 ```
 /plugin marketplace add /Users/giginet/work/Swift/icon-composer-mcp
-/plugin install icon-composer@giginet
+/plugin install icon-composer@icon-composer-dev
 ```
+
+The marketplace is named `icon-composer-dev` in `.claude-plugin/marketplace.json`; the `@icon-composer-dev` suffix disambiguates the plugin if you have multiple marketplaces installed.
 
 ## Skills
 
@@ -24,10 +26,10 @@ Once installed, two skills are available:
 
 | Skill | Triggers on | What it does |
 |---|---|---|
-| `/icon-composer:create` | "make an icon", "create .icon", authoring any icon.json property | Writes an `.icon` package from an `icon.json` document + base64/file image assets. Validates before writing. |
+| `/icon-composer:create` | "make an icon", "create .icon", authoring any icon.json property | Writes a `.icon` package from an `icon.json` document plus image asset files. Validates against the schema before writing and checks every `image-name` has a matching `--asset`. |
 | `/icon-composer:validate` | "check this icon", "why won't Icon Composer open this" | Runs `jsonschema` against `icon.json`, cross-checks referenced assets against `Assets/` on disk, and explains failures in terms of the schema. |
 
-Both skills invoke small Python CLIs bundled with the plugin and managed with [uv](https://docs.astral.sh/uv/).
+Both skills shell out to small Python CLIs bundled with the plugin and managed with [uv](https://docs.astral.sh/uv/). Each skill's preflight stops with an error if `uv` is not on `PATH`.
 
 ## Repo layout
 
@@ -44,10 +46,11 @@ Both skills invoke small Python CLIs bundled with the plugin and managed with [u
 │       ├── scripts/
 │       │   ├── create_icon.py
 │       │   └── validate_icon.py
+│       ├── tests/                       pytest suite for both scripts
 │       ├── icon-schema.json             source of truth for icon.json
-│       ├── pyproject.toml               uv-managed deps: jsonschema, pillow
+│       ├── pyproject.toml               uv-managed deps: jsonschema, pillow, pytest (dev)
 │       └── uv.lock
-├── fixtures/                            example .icon packages (simple, complex, variables-changed, test-generated)
+├── fixtures/                            example .icon packages — simple-image, variables-changed, complex-icon, test-generated, plugin-test
 └── README.md
 ```
 

@@ -1,5 +1,5 @@
 {
-  "name": "giginet",
+  "name": "icon-composer-dev",
   "owner": { "name": "giginet" },
   "plugins": [
     { "name": "icon-composer", "source": "./plugins/icon-composer" }

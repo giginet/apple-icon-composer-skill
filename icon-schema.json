@@ -39,8 +39,8 @@
     },
     "appearance": {
       "type": "string",
-      "description": "The appearance this specialization applies to. Omit the 'appearance' key on a specialization entry to target the default (light) appearance.",
-      "enum": ["dark", "tinted"]
+      "description": "The appearance this specialization applies to. Omitting the 'appearance' key typically targets the default (light) appearance, but 'light' may also be specified explicitly.",
+      "enum": ["light", "dark", "tinted"]
     },
     "specialization-base": {
       "type": "object",
@@ -205,29 +205,23 @@
     },
     "blend-mode": {
       "type": "string",
-      "description": "Blend mode for compositing a layer",
+      "description": "Blend mode for compositing a layer (Color.BlendMode in Icon Composer)",
       "enum": [
         "normal",
-        "multiply",
-        "screen",
-        "overlay",
         "darken",
+        "multiply",
+        "plus-darker",
         "lighten",
-        "color-dodge",
-        "color-burn",
+        "screen",
+        "plus-lighter",
+        "overlay",
         "soft-light",
-        "hard-light",
-        "difference",
-        "exclusion",
-        "hue",
-        "saturation",
-        "color",
-        "luminosity"
+        "hard-light"
       ]
     },
     "layer": {
       "type": "object",
-      "description": "A single image layer within a group. Any direct scalar property may additionally (or alternatively) be specified per-appearance via its corresponding '-specializations' array.",
+      "description": "A single image layer within a group. Most scalar properties — Color (fill, blend-mode, opacity), LiquidGlass (glass), Composition.Visible (hidden), Composition.Layout (image-name, position) — may be overridden per appearance via a corresponding '-specializations' array.",
       "properties": {
         "name": {
           "type": "string",
@@ -235,48 +229,61 @@
         },
         "image-name": {
           "type": "string",
-          "description": "Filename of the image asset in the Assets directory"
+          "description": "Filename of the image asset in the Assets directory (Composition.Layout)"
         },
         "image-name-specializations": {
           "$ref": "#/$defs/specializations-of-string",
-          "description": "Per-appearance image-name overrides (e.g. different assets for light/dark)"
+          "description": "Per-appearance image-name overrides (Composition.Layout)"
         },
         "fill": {
           "$ref": "#/$defs/fill",
-          "description": "Optional color fill applied to the layer"
+          "description": "Color fill applied to the layer (Color.Fill)"
         },
         "fill-specializations": {
           "$ref": "#/$defs/specializations-of-fill",
-          "description": "Per-appearance fill overrides for the layer"
+          "description": "Per-appearance fill overrides (Color.Fill)"
+        },
+        "blend-mode": {
+          "$ref": "#/$defs/blend-mode",
+          "description": "Blend mode for compositing (Color.BlendMode)"
+        },
+        "blend-mode-specializations": {
+          "$ref": "#/$defs/specializations-of-blend-mode",
+          "description": "Per-appearance blend-mode overrides (Color.BlendMode)"
+        },
+        "opacity": {
+          "type": "number",
+          "description": "Layer opacity 0.0–1.0 (Color.Opacity)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "opacity-specializations": {
+          "$ref": "#/$defs/specializations-of-number",
+          "description": "Per-appearance opacity overrides (Color.Opacity)"
         },
         "glass": {
           "type": "boolean",
-          "description": "Whether a glass effect is applied to the layer"
+          "description": "Whether a glass effect is applied (LiquidGlass.Mode)"
         },
         "glass-specializations": {
           "$ref": "#/$defs/specializations-of-boolean",
-          "description": "Per-appearance glass overrides"
+          "description": "Per-appearance glass overrides (LiquidGlass.Mode)"
         },
         "hidden": {
           "type": "boolean",
-          "description": "Whether the layer is hidden"
+          "description": "Whether the layer is hidden (Composition.Visible)"
         },
         "hidden-specializations": {
           "$ref": "#/$defs/specializations-of-boolean",
-          "description": "Per-appearance hidden overrides"
-        },
-        "blend-mode": { "$ref": "#/$defs/blend-mode" },
-        "blend-mode-specializations": {
-          "$ref": "#/$defs/specializations-of-blend-mode",
-          "description": "Per-appearance blend-mode overrides"
+          "description": "Per-appearance hidden overrides (Composition.Visible)"
         },
         "position": {
           "$ref": "#/$defs/position",
-          "description": "Position and scale adjustments for the layer"
+          "description": "Position and scale adjustments (Composition.Layout)"
         },
         "position-specializations": {
           "$ref": "#/$defs/specializations-of-position",
-          "description": "Per-appearance position overrides"
+          "description": "Per-appearance position overrides (Composition.Layout)"
         }
       },
       "required": ["name"],
@@ -292,8 +299,8 @@
       "properties": {
         "kind": {
           "type": "string",
-          "description": "The type of shadow. 'none' disables the shadow.",
-          "enum": ["none", "neutral", "colored"]
+          "description": "Shadow kind (JSON value; the Icon Composer UI shows different labels): 'neutral' (UI 'Natural'), 'layer-color' (UI 'Chromatic'), 'none' (UI 'Off').",
+          "enum": ["neutral", "layer-color", "none"]
         },
         "opacity": {
           "type": "number",
@@ -341,7 +348,7 @@
     },
     "group": {
       "type": "object",
-      "description": "A layer group containing one or more layers with shared effects",
+      "description": "A layer group. Carries the 5 LiquidGlass properties — Mode (lighting), Specular, Blur, Translucency, Shadow — each with an optional '-specializations' for per-appearance overrides.",
       "properties": {
         "layers": {
           "type": "array",
@@ -351,12 +358,38 @@
         },
         "lighting": {
           "type": "string",
-          "description": "Lighting mode applied to the group's layers",
+          "description": "LiquidGlass.Mode — how lighting is applied to the group",
           "enum": ["individual", "combined"]
         },
         "lighting-specializations": {
           "$ref": "#/$defs/specializations-of-string",
-          "description": "Per-appearance lighting overrides"
+          "description": "Per-appearance LiquidGlass.Mode overrides"
+        },
+        "specular": {
+          "type": "boolean",
+          "description": "LiquidGlass.Specular — highlight on/off"
+        },
+        "specular-specializations": {
+          "$ref": "#/$defs/specializations-of-boolean",
+          "description": "Per-appearance specular overrides (LiquidGlass.Specular)"
+        },
+        "blur": {
+          "type": "number",
+          "description": "LiquidGlass.Blur amount (0.0–1.0)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "blur-specializations": {
+          "$ref": "#/$defs/specializations-of-number",
+          "description": "Per-appearance blur overrides (LiquidGlass.Blur)"
+        },
+        "position": {
+          "$ref": "#/$defs/position",
+          "description": "Group-level position and scale adjustments (Composition.Layout)"
+        },
+        "position-specializations": {
+          "$ref": "#/$defs/specializations-of-position",
+          "description": "Per-appearance group-level position overrides (Composition.Layout)"
         },
         "shadow": { "$ref": "#/$defs/shadow" },
         "translucency": { "$ref": "#/$defs/translucency" }

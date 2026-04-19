@@ -73,18 +73,24 @@ typealias PositionOrAutomatic = OrAutomatic<Position>
 
 // MARK: - Layer
 
+// A layer within a group. Most scalar properties can be specialized per
+// appearance via '-specializations': Color (fill, blend-mode, opacity),
+// LiquidGlass (glass), Composition.Visible (hidden), Composition.Layout
+// (image-name, position).
 struct Layer: Codable, Sendable {
     var name: String
     var imageName: String?
     var imageNameSpecializations: [Specialization<StringOrAutomatic>]?
     var fill: Fill?
     var fillSpecializations: [Specialization<FillOrAutomatic>]?
+    var blendMode: String?
+    var blendModeSpecializations: [Specialization<StringOrAutomatic>]?
+    var opacity: Double?
+    var opacitySpecializations: [Specialization<DoubleOrAutomatic>]?
     var glass: Bool?
     var glassSpecializations: [Specialization<BoolOrAutomatic>]?
     var hidden: Bool?
     var hiddenSpecializations: [Specialization<BoolOrAutomatic>]?
-    var blendMode: String?
-    var blendModeSpecializations: [Specialization<StringOrAutomatic>]?
     var position: Position?
     var positionSpecializations: [Specialization<PositionOrAutomatic>]?
 
@@ -94,12 +100,14 @@ struct Layer: Codable, Sendable {
         case imageNameSpecializations = "image-name-specializations"
         case fill
         case fillSpecializations = "fill-specializations"
+        case blendMode = "blend-mode"
+        case blendModeSpecializations = "blend-mode-specializations"
+        case opacity
+        case opacitySpecializations = "opacity-specializations"
         case glass
         case glassSpecializations = "glass-specializations"
         case hidden
         case hiddenSpecializations = "hidden-specializations"
-        case blendMode = "blend-mode"
-        case blendModeSpecializations = "blend-mode-specializations"
         case position
         case positionSpecializations = "position-specializations"
     }
@@ -143,16 +151,31 @@ struct Translucency: Codable, Sendable {
     }
 }
 
+// A group carries the 5 LiquidGlass properties (Mode/lighting, Specular,
+// Blur, Translucency, Shadow) plus a Composition.Layout position, each
+// with a '-specializations' sibling for per-appearance overrides.
 struct Group: Codable, Sendable {
     var layers: [Layer]
     var lighting: String?
     var lightingSpecializations: [Specialization<StringOrAutomatic>]?
+    var specular: Bool?
+    var specularSpecializations: [Specialization<BoolOrAutomatic>]?
+    var blur: Double?
+    var blurSpecializations: [Specialization<DoubleOrAutomatic>]?
+    var position: Position?
+    var positionSpecializations: [Specialization<PositionOrAutomatic>]?
     var shadow: Shadow
     var translucency: Translucency
 
     enum CodingKeys: String, CodingKey {
         case layers, lighting
         case lightingSpecializations = "lighting-specializations"
+        case specular
+        case specularSpecializations = "specular-specializations"
+        case blur
+        case blurSpecializations = "blur-specializations"
+        case position
+        case positionSpecializations = "position-specializations"
         case shadow, translucency
     }
 }

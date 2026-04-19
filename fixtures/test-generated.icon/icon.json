@@ -1,0 +1,67 @@
+{
+  "fill-specializations" : [
+    {
+      "value" : {
+        "linear-gradient" : [
+          "extended-srgb:1.00000,0.75000,0.30000,1.00000",
+          "extended-srgb:1.00000,0.40000,0.20000,1.00000"
+        ]
+      }
+    },
+    {
+      "appearance" : "dark",
+      "value" : {
+        "linear-gradient" : [
+          "extended-srgb:0.15000,0.05000,0.35000,1.00000",
+          "extended-srgb:0.35000,0.10000,0.50000,1.00000"
+        ]
+      }
+    }
+  ],
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "extended-srgb:1.00000,0.95000,0.70000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "extended-srgb:0.95000,0.30000,0.60000,1.00000",
+                  "extended-srgb:0.40000,0.20000,0.80000,1.00000"
+                ]
+              }
+            }
+          ],
+          "image-name" : "ring.png",
+          "name" : "ring"
+        },
+        {
+          "fill" : {
+            "solid" : "extended-srgb:1.00000,1.00000,1.00000,1.00000"
+          },
+          "glass" : true,
+          "image-name" : "star.png",
+          "name" : "star"
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

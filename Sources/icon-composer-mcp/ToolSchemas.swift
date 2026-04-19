@@ -12,6 +12,12 @@ enum ToolSchemas {
             Create an Apple Icon Composer .icon package. \
             Provide the icon.json document and base64-encoded image assets. \
             The .icon package (a directory) will be created at output_path.
+
+            Canvas: Icon Composer's design canvas is 1024x1024 points. \
+            Image assets should be 1024x1024 PNG (or SVG) with their content centered in the canvas; \
+            'position' uses this 1024-point coordinate system where translation-in-points [0, 0] \
+            means no offset from the canvas center. \
+            Smaller assets will render at their intrinsic size and appear visually smaller than expected.
             """,
         inputSchema: .object([
             "type": .string("object"),
@@ -31,8 +37,13 @@ enum ToolSchemas {
                         'color-space-for-untagged-svg-colors'. \
                         Each group contains 'layers', 'shadow', 'translucency', optional 'lighting'. \
                         Layers reference assets by 'image-name' (or 'image-name-specializations' for per-appearance assets). \
-                        Any scalar property may have an appearance-specific override via a '-specializations' array \
-                        whose items are { appearance?: 'dark' | 'tinted', value: T | 'automatic' }.
+                        Most scalar properties can have an appearance-specific override via a \
+                        '-specializations' array whose items are \
+                        { appearance?: 'dark' | 'tinted', value: T | 'automatic' }. \
+                        Specializable categories: Color (fill, blend-mode, opacity), \
+                        LiquidGlass (glass, specular, blur, lighting), Composition.Visible (hidden), \
+                        Composition.Layout (image-name, position), Translucency (enabled, value), \
+                        Shadow (kind, opacity).
                         """
                     ),
                 ]),

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "icon-compoer": {
+      "type": "stdio",
+      "command": "swift",
+      "args": [
+        "run",
+        "icon-composer-mcp"
+      ],
+      "env": {}
+    }
+  }
+}

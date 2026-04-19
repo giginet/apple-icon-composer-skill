@@ -20,13 +20,26 @@
     {
       "layers" : [
         {
+          "blend-mode" : "plus-darker",
           "fill" : {
             "solid" : "extended-srgb:0.00000,0.78431,0.70196,1.00000"
           },
           "glass" : false,
           "hidden" : false,
           "image-name" : "wineglass.svg",
-          "name" : "wineglass"
+          "name" : "wineglass",
+          "position-specializations" : [
+            {
+              "appearance" : "light",
+              "value" : {
+                "scale" : 1.32,
+                "translation-in-points" : [
+                  45,
+                  77
+                ]
+              }
+            }
+          ]
         }
       ],
       "shadow" : {

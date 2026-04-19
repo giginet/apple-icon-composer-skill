@@ -13,13 +13,6 @@ This repo is published at <https://github.com/giginet/icon-composer-agent-skill>
 /plugin install icon-composer@icon-composer
 ```
 
-### From a local checkout (development)
-
-```
-/plugin marketplace add /path/to/icon-composer-agent-skill
-/plugin install icon-composer@icon-composer
-```
-
 ### About the `@icon-composer` suffix
 
 The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; the `@icon-composer` after the plugin name disambiguates it from any other marketplaces you have installed.

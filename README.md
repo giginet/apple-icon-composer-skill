@@ -8,17 +8,17 @@ From any Claude Code session:
 
 ```
 /plugin marketplace add giginet/icon-composer-mcp
-/plugin install icon-composer@icon-composer-dev
+/plugin install icon-composer@icon-composer
 ```
 
 Local development (point the marketplace at a checkout instead of GitHub):
 
 ```
 /plugin marketplace add /Users/giginet/work/Swift/icon-composer-mcp
-/plugin install icon-composer@icon-composer-dev
+/plugin install icon-composer@icon-composer
 ```
 
-The marketplace is named `icon-composer-dev` in `.claude-plugin/marketplace.json`; the `@icon-composer-dev` suffix disambiguates the plugin if you have multiple marketplaces installed.
+The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; the `@icon-composer` suffix disambiguates the plugin if you have multiple marketplaces installed.
 
 ## Skills
 

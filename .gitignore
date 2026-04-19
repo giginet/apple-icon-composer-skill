@@ -1,9 +1,7 @@
 .DS_Store
-.build/
-.swiftpm/
-Package.resolved
-Packages/
-.venv/
 .serena/
-.claude/
-*.xcodeproj
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.pyc

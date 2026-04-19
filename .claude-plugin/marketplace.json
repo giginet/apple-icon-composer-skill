@@ -1,0 +1,7 @@
+{
+  "name": "giginet",
+  "owner": { "name": "giginet" },
+  "plugins": [
+    { "name": "icon-composer", "source": "./plugins/icon-composer" }
+  ]
+}

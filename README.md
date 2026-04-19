@@ -4,21 +4,29 @@ A personal [Claude Code plugin marketplace](https://docs.claude.com/en/docs/clau
 
 ## Install
 
-From any Claude Code session:
+This repo is published at <https://github.com/giginet/icon-composer-agent-skill>. The snippets below are all run inside a Claude Code session.
+
+### From GitHub
 
 ```
-/plugin marketplace add giginet/icon-composer-mcp
+/plugin marketplace add giginet/icon-composer-agent-skill
 /plugin install icon-composer@icon-composer
 ```
 
-Local development (point the marketplace at a checkout instead of GitHub):
+### From a local checkout (development)
 
 ```
-/plugin marketplace add /Users/giginet/work/Swift/icon-composer-mcp
+/plugin marketplace add /path/to/icon-composer-agent-skill
 /plugin install icon-composer@icon-composer
 ```
 
-The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; the `@icon-composer` suffix disambiguates the plugin if you have multiple marketplaces installed.
+### About the `@icon-composer` suffix
+
+The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; the `@icon-composer` after the plugin name disambiguates it from any other marketplaces you have installed.
+
+### After install
+
+Run `/reload-plugins` once so Claude Code picks up the new skills. You can confirm they are active by typing `/` and looking for `/icon-composer:create` and `/icon-composer:validate` in the list.
 
 ## Skills
 

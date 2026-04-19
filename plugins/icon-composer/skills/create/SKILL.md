@@ -5,6 +5,16 @@ description: Create a new Apple Icon Composer `.icon` package by writing an `ico
 
 # Create an Icon Composer `.icon` package
 
+## Preflight: confirm `uv` is installed
+
+Before running any commands from this skill, execute `which uv`. If it prints a path, continue. If it exits non-zero (no `uv` on PATH), stop and tell the user:
+
+> `uv` is not installed — install it with `curl -LsSf https://astral.sh/uv/install.sh | sh` (or see https://docs.astral.sh/uv/getting-started/installation/). This skill uses `uv run` to invoke its Python tooling.
+
+Do not attempt to fall back to a system `python3` — the bundled `pyproject.toml` pins `requires-python = ">=3.9"` and dependency versions via `uv.lock`.
+
+## Overview
+
 A `.icon` is a directory (macOS document package) containing a declarative `icon.json` and an `Assets/` folder. This skill bundles a Python CLI at `${CLAUDE_PLUGIN_ROOT}/scripts/create_icon.py` that writes the package atomically, validates the JSON against `icon-schema.json` before writing, and verifies every referenced `image-name` has a matching asset file.
 
 ## Invocation

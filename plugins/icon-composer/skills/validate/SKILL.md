@@ -5,6 +5,16 @@ description: Validate an existing Apple Icon Composer `.icon` package (or standa
 
 # Validate an Icon Composer `.icon` package
 
+## Preflight: confirm `uv` is installed
+
+Before running any commands from this skill, execute `which uv`. If it prints a path, continue. If it exits non-zero (no `uv` on PATH), stop and tell the user:
+
+> `uv` is not installed — install it with `curl -LsSf https://astral.sh/uv/install.sh | sh` (or see https://docs.astral.sh/uv/getting-started/installation/). This skill uses `uv run` to invoke its Python tooling.
+
+Do not attempt to fall back to a system `python3` — the bundled `pyproject.toml` pins `requires-python = ">=3.9"` and dependency versions via `uv.lock`.
+
+## Overview
+
 This skill exposes a Python CLI at `${CLAUDE_PLUGIN_ROOT}/scripts/validate_icon.py` that:
 
 1. Parses `icon.json` and checks it against `${CLAUDE_PLUGIN_ROOT}/icon-schema.json` using `jsonschema` (Draft 2020-12).

@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.apple.com/icon-composer/icon.json",
+  "title": "Apple Icon Composer Icon",
+  "description": "Schema for Apple Icon Composer .icon package icon.json files",
+  "type": "object",
+  "properties": {
+    "fill": {
+      "$ref": "#/$defs/fill",
+      "description": "Background fill for the icon (used when fill-specializations is not present)"
+    },
+    "fill-specializations": {
+      "$ref": "#/$defs/specializations-of-fill",
+      "description": "Appearance-specific background fill overrides"
+    },
+    "color-space-for-untagged-svg-colors": {
+      "type": "string",
+      "description": "Color space to use for SVG colors that don't specify one",
+      "enum": ["srgb", "display-p3"]
+    },
+    "groups": {
+      "type": "array",
+      "description": "Ordered list of layer groups composing the icon",
+      "items": {
+        "$ref": "#/$defs/group"
+      }
+    },
+    "supported-platforms": {
+      "$ref": "#/$defs/supported-platforms"
+    }
+  },
+  "required": ["groups", "supported-platforms"],
+  "additionalProperties": false,
+  "$defs": {
+    "color": {
+      "type": "string",
+      "description": "A color string in the format 'colorspace:component1,component2,...'. Examples: 'extended-srgb:0.00000,0.53333,1.00000,1.00000', 'display-p3:1.00000,0.18845,0.18108,1.00000', 'extended-gray:1.00000,1.00000'",
+      "pattern": "^(extended-srgb|srgb|display-p3|extended-gray|extended-linear-gray):[0-9.-]+(,[0-9.-]+)*$"
+    },
+    "appearance": {
+      "type": "string",
+      "description": "The appearance this specialization applies to. Omit the 'appearance' key on a specialization entry to target the default (light) appearance.",
+      "enum": ["dark", "tinted"]
+    },
+    "specialization-base": {
+      "type": "object",
+      "description": "Base shape for any '-specializations' array entry: an optional 'appearance' and a required 'value'.",
+      "properties": {
+        "appearance": { "$ref": "#/$defs/appearance" }
+      },
+      "required": ["value"]
+    },
+    "automatic-value": {
+      "type": "string",
+      "description": "Literal 'automatic' — means inherit the default appearance's value automatically",
+      "enum": ["automatic"]
+    },
+    "fill": {
+      "type": "object",
+      "description": "A fill definition. Exactly one of the fill type properties should be present.",
+      "properties": {
+        "automatic-gradient": {
+          "$ref": "#/$defs/color",
+          "description": "An automatic gradient derived from a single base color"
+        },
+        "solid": {
+          "$ref": "#/$defs/color",
+          "description": "A solid color fill"
+        },
+        "linear-gradient": {
+          "type": "array",
+          "description": "A linear gradient defined by two color stops",
+          "items": { "$ref": "#/$defs/color" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "oneOf": [
+        { "required": ["automatic-gradient"] },
+        { "required": ["solid"] },
+        { "required": ["linear-gradient"] }
+      ],
+      "additionalProperties": false
+    },
+    "specializations-of-fill": {
+      "type": "array",
+      "description": "Appearance-specific fill overrides. Each entry's 'value' may be either a fill object or the literal string 'automatic'.",
+      "items": {
+        "allOf": [{ "$ref": "#/$defs/specialization-base" }],
+        "properties": {
+          "appearance": { "$ref": "#/$defs/appearance" },
+          "value": {
+            "oneOf": [
+              { "$ref": "#/$defs/fill" },
+              { "$ref": "#/$defs/automatic-value" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "specializations-of-string": {
+      "type": "array",
+      "description": "Appearance-specific string overrides (e.g. image file name)",
+      "items": {
+        "allOf": [{ "$ref": "#/$defs/specialization-base" }],
+        "properties": {
+          "appearance": { "$ref": "#/$defs/appearance" },
+          "value": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/automatic-value" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "specializations-of-boolean": {
+      "type": "array",
+      "description": "Appearance-specific boolean overrides",
+      "items": {
+        "allOf": [{ "$ref": "#/$defs/specialization-base" }],
+        "properties": {
+          "appearance": { "$ref": "#/$defs/appearance" },
+          "value": {
+            "oneOf": [
+              { "type": "boolean" },
+              { "$ref": "#/$defs/automatic-value" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "specializations-of-number": {
+      "type": "array",
+      "description": "Appearance-specific number overrides",
+      "items": {
+        "allOf": [{ "$ref": "#/$defs/specialization-base" }],
+        "properties": {
+          "appearance": { "$ref": "#/$defs/appearance" },
+          "value": {
+            "oneOf": [
+              { "type": "number" },
+              { "$ref": "#/$defs/automatic-value" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "specializations-of-position": {
+      "type": "array",
+      "description": "Appearance-specific position overrides",
+      "items": {
+        "allOf": [{ "$ref": "#/$defs/specialization-base" }],
+        "properties": {
+          "appearance": { "$ref": "#/$defs/appearance" },
+          "value": {
+            "oneOf": [
+              { "$ref": "#/$defs/position" },
+              { "$ref": "#/$defs/automatic-value" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "specializations-of-blend-mode": {
+      "type": "array",
+      "description": "Appearance-specific blend-mode overrides",
+      "items": {
+        "allOf": [{ "$ref": "#/$defs/specialization-base" }],
+        "properties": {
+          "appearance": { "$ref": "#/$defs/appearance" },
+          "value": {
+            "oneOf": [
+              { "$ref": "#/$defs/blend-mode" },
+              { "$ref": "#/$defs/automatic-value" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "position": {
+      "type": "object",
+      "description": "Position and scale adjustments for a layer",
+      "properties": {
+        "scale": {
+          "type": "number",
+          "description": "Scale factor for the layer (1.0 = original size)",
+          "exclusiveMinimum": 0
+        },
+        "translation-in-points": {
+          "type": "array",
+          "description": "Translation offset as [x, y] in points",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "additionalProperties": false
+    },
+    "blend-mode": {
+      "type": "string",
+      "description": "Blend mode for compositing a layer",
+      "enum": [
+        "normal",
+        "multiply",
+        "screen",
+        "overlay",
+        "darken",
+        "lighten",
+        "color-dodge",
+        "color-burn",
+        "soft-light",
+        "hard-light",
+        "difference",
+        "exclusion",
+        "hue",
+        "saturation",
+        "color",
+        "luminosity"
+      ]
+    },
+    "layer": {
+      "type": "object",
+      "description": "A single image layer within a group. Any direct scalar property may additionally (or alternatively) be specified per-appearance via its corresponding '-specializations' array.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name of the layer"
+        },
+        "image-name": {
+          "type": "string",
+          "description": "Filename of the image asset in the Assets directory"
+        },
+        "image-name-specializations": {
+          "$ref": "#/$defs/specializations-of-string",
+          "description": "Per-appearance image-name overrides (e.g. different assets for light/dark)"
+        },
+        "fill": {
+          "$ref": "#/$defs/fill",
+          "description": "Optional color fill applied to the layer"
+        },
+        "fill-specializations": {
+          "$ref": "#/$defs/specializations-of-fill",
+          "description": "Per-appearance fill overrides for the layer"
+        },
+        "glass": {
+          "type": "boolean",
+          "description": "Whether a glass effect is applied to the layer"
+        },
+        "glass-specializations": {
+          "$ref": "#/$defs/specializations-of-boolean",
+          "description": "Per-appearance glass overrides"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "Whether the layer is hidden"
+        },
+        "hidden-specializations": {
+          "$ref": "#/$defs/specializations-of-boolean",
+          "description": "Per-appearance hidden overrides"
+        },
+        "blend-mode": { "$ref": "#/$defs/blend-mode" },
+        "blend-mode-specializations": {
+          "$ref": "#/$defs/specializations-of-blend-mode",
+          "description": "Per-appearance blend-mode overrides"
+        },
+        "position": {
+          "$ref": "#/$defs/position",
+          "description": "Position and scale adjustments for the layer"
+        },
+        "position-specializations": {
+          "$ref": "#/$defs/specializations-of-position",
+          "description": "Per-appearance position overrides"
+        }
+      },
+      "required": ["name"],
+      "anyOf": [
+        { "required": ["image-name"] },
+        { "required": ["image-name-specializations"] }
+      ],
+      "additionalProperties": false
+    },
+    "shadow": {
+      "type": "object",
+      "description": "Shadow settings for a layer group",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "The type of shadow. 'none' disables the shadow.",
+          "enum": ["none", "neutral", "colored"]
+        },
+        "opacity": {
+          "type": "number",
+          "description": "Shadow opacity (0.0 to 1.0)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "kind-specializations": {
+          "$ref": "#/$defs/specializations-of-string",
+          "description": "Per-appearance shadow kind overrides"
+        },
+        "opacity-specializations": {
+          "$ref": "#/$defs/specializations-of-number",
+          "description": "Per-appearance shadow opacity overrides"
+        }
+      },
+      "required": ["kind", "opacity"],
+      "additionalProperties": false
+    },
+    "translucency": {
+      "type": "object",
+      "description": "Translucency settings for a layer group",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether translucency is enabled"
+        },
+        "value": {
+          "type": "number",
+          "description": "Translucency amount (0.0 to 1.0)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "enabled-specializations": {
+          "$ref": "#/$defs/specializations-of-boolean",
+          "description": "Per-appearance translucency enabled overrides"
+        },
+        "value-specializations": {
+          "$ref": "#/$defs/specializations-of-number",
+          "description": "Per-appearance translucency value overrides"
+        }
+      },
+      "required": ["enabled", "value"],
+      "additionalProperties": false
+    },
+    "group": {
+      "type": "object",
+      "description": "A layer group containing one or more layers with shared effects",
+      "properties": {
+        "layers": {
+          "type": "array",
+          "description": "Ordered list of layers in this group",
+          "items": { "$ref": "#/$defs/layer" },
+          "minItems": 1
+        },
+        "lighting": {
+          "type": "string",
+          "description": "Lighting mode applied to the group's layers",
+          "enum": ["individual", "combined"]
+        },
+        "lighting-specializations": {
+          "$ref": "#/$defs/specializations-of-string",
+          "description": "Per-appearance lighting overrides"
+        },
+        "shadow": { "$ref": "#/$defs/shadow" },
+        "translucency": { "$ref": "#/$defs/translucency" }
+      },
+      "required": ["layers", "shadow", "translucency"],
+      "additionalProperties": false
+    },
+    "supported-platforms": {
+      "type": "object",
+      "description": "Platform configurations for the icon",
+      "properties": {
+        "squares": {
+          "type": "string",
+          "description": "Square icon platform configuration",
+          "enum": ["shared"]
+        },
+        "circles": {
+          "type": "array",
+          "description": "List of platforms using circular icons",
+          "items": {
+            "type": "string",
+            "enum": ["watchOS"]
+          }
+        }
+      },
+      "required": ["squares"],
+      "additionalProperties": false
+    }
+  }
+}

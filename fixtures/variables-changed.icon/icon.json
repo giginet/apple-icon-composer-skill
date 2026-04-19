@@ -1,0 +1,77 @@
+{
+  "color-space-for-untagged-svg-colors" : "display-p3",
+  "fill-specializations" : [
+    {
+      "value" : {
+        "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+      }
+    },
+    {
+      "appearance" : "dark",
+      "value" : {
+        "linear-gradient" : [
+          "extended-gray:1.00000,1.00000",
+          "extended-srgb:0.79608,0.18824,0.87843,1.00000"
+        ]
+      }
+    }
+  ],
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "extended-srgb:0.00000,0.78431,0.70196,1.00000"
+          },
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "wineglass.svg",
+          "name" : "wineglass"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:1.00000,0.18845,0.18108,1.00000",
+              "display-p3:1.00000,0.18845,0.18108,1.00000"
+            ]
+          },
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "video.fill.png",
+          "name" : "video.fill",
+          "position" : {
+            "scale" : 1.09,
+            "translation-in-points" : [
+              5,
+              22
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

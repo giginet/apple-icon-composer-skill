@@ -7,11 +7,7 @@ description: Validate an existing Apple Icon Composer `.icon` package (or standa
 
 ## Preflight: confirm `uv` is installed
 
-Before running any commands from this skill, execute `which uv`. If it prints a path, continue. If it exits non-zero (no `uv` on PATH), stop and tell the user:
-
-> `uv` is not installed — install it with `curl -LsSf https://astral.sh/uv/install.sh | sh` (or see https://docs.astral.sh/uv/getting-started/installation/). This skill uses `uv run` to invoke its Python tooling.
-
-Do not attempt to fall back to a system `python3` — the bundled `pyproject.toml` pins `requires-python = ">=3.9"` and dependency versions via `uv.lock`.
+Before running any commands from this skill, execute `which uv`. If it exits non-zero (no `uv` on PATH), stop and report the error to the user — this skill requires `uv`. Do not fall back to a system `python3`; the bundled `pyproject.toml` pins `requires-python = ">=3.9"` and dependency versions via `uv.lock`.
 
 ## Overview
 

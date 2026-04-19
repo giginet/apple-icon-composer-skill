@@ -79,7 +79,3 @@ uv run python scripts/validate_icon.py /tmp/smoke.icon
 ```
 
 `icon-schema.json` is the authoritative definition of the `icon.json` format — including per-appearance `-specializations` overrides, the LiquidGlass property set on groups, and the enum values Icon Composer's UI labels quietly map to (for example, Shadow `"Natural"` → `"neutral"`, `"Chromatic"` → `"layer-color"`).
-
-## History
-
-The project started as a Swift MCP server (see git history prior to this README rewrite). It was reduced to this plugin form because managing JSON files and invoking `jsonschema` doesn't need a long-lived process.

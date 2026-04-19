@@ -40,7 +40,10 @@ def test_schema_violation_reports_exit_1(
                 "groups": [
                     {
                         "layers": [{"name": "x", "image-name": "x.png"}],
-                        "shadow": {"kind": "Natural", "opacity": 0.5},  # UI label, not JSON
+                        "shadow": {
+                            "kind": "Natural",
+                            "opacity": 0.5,
+                        },  # UI label, not JSON
                         "translucency": {"enabled": True, "value": 0.5},
                     }
                 ],

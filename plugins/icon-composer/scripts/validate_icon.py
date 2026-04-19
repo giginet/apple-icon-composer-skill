@@ -45,7 +45,9 @@ def _format_error(err) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("path", help="Path to a .icon package directory or an icon.json file")
+    parser.add_argument(
+        "path", help="Path to a .icon package directory or an icon.json file"
+    )
     parser.add_argument(
         "--skip-assets",
         action="store_true",
@@ -75,7 +77,9 @@ def main(argv: list[str] | None = None) -> int:
     if icon_pkg is not None and not args.skip_assets:
         assets_dir = icon_pkg / "Assets"
         referenced = _collect_referenced_assets(data)
-        present = {p.name for p in assets_dir.iterdir()} if assets_dir.is_dir() else set()
+        present = (
+            {p.name for p in assets_dir.iterdir()} if assets_dir.is_dir() else set()
+        )
         missing = sorted(referenced - present)
         orphaned = sorted(present - referenced)
         if missing:
@@ -85,7 +89,9 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         if orphaned:
             # Orphans are a warning, not an error.
-            print(f"warning: {len(orphaned)} unused asset(s) in Assets/: {', '.join(orphaned)}")
+            print(
+                f"warning: {len(orphaned)} unused asset(s) in Assets/: {', '.join(orphaned)}"
+            )
 
     print(f"VALID: {icon_json_path}")
     return 0

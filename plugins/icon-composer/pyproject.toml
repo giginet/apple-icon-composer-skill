@@ -11,6 +11,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "ruff>=0.6",
+    "ty",
 ]
 
 [tool.uv]
@@ -20,3 +22,6 @@ exclude-newer = "1 week"
 [tool.pytest.ini_options]
 pythonpath = ["scripts"]
 testpaths = ["tests"]
+
+[tool.ty.environment]
+extra-paths = ["scripts"]

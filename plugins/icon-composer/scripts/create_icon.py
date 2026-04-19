@@ -17,9 +17,7 @@ SCHEMA_PATH = PLUGIN_ROOT / "icon-schema.json"
 
 def _parse_asset(spec: str) -> tuple[str, Path]:
     if "=" not in spec:
-        raise argparse.ArgumentTypeError(
-            f"--asset expects NAME=PATH, got {spec!r}"
-        )
+        raise argparse.ArgumentTypeError(f"--asset expects NAME=PATH, got {spec!r}")
     name, _, raw_path = spec.partition("=")
     name = name.strip()
     path = Path(raw_path).expanduser().resolve()
@@ -96,7 +94,10 @@ def main(argv: list[str] | None = None) -> int:
             key=lambda e: list(e.absolute_path),
         )
         if errors:
-            print(f"error: icon document failed schema validation ({len(errors)} error(s))", file=sys.stderr)
+            print(
+                f"error: icon document failed schema validation ({len(errors)} error(s))",
+                file=sys.stderr,
+            )
             for err in errors:
                 pointer = "/" + "/".join(str(p) for p in err.absolute_path)
                 print(f"  at {pointer}: {err.message}", file=sys.stderr)
@@ -113,7 +114,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if output.exists():
         if not args.force:
-            print(f"error: {output} already exists (use --force to overwrite)", file=sys.stderr)
+            print(
+                f"error: {output} already exists (use --force to overwrite)",
+                file=sys.stderr,
+            )
             return 1
         shutil.rmtree(output)
 
@@ -125,9 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     for name, src in asset_map.items():
         shutil.copyfile(src, assets_dir / name)
 
-    (output / "icon.json").write_text(
-        json.dumps(icon, indent=2, sort_keys=True) + "\n"
-    )
+    (output / "icon.json").write_text(json.dumps(icon, indent=2, sort_keys=True) + "\n")
 
     print(f"created {output}")
     return 0

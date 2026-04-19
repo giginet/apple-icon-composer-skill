@@ -19,7 +19,7 @@ The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; t
 
 ### After install
 
-Run `/reload-plugins` once so Claude Code picks up the new skills. You can confirm they are active by typing `/` and looking for `/icon-composer:create` and `/icon-composer:validate` in the list.
+Run `/reload-plugins` once so Claude Code picks up the new skills. You can confirm they are active by typing `/` and looking for `/icon-composer:authoring` and `/icon-composer:validate` in the list.
 
 ## Skills
 
@@ -27,7 +27,7 @@ Once installed, two skills are available:
 
 | Skill | Triggers on | What it does |
 |---|---|---|
-| `/icon-composer:create` | "make an icon", "create .icon", authoring any icon.json property | Writes a `.icon` package from an `icon.json` document plus image asset files. Validates against the schema before writing and checks every `image-name` has a matching `--asset`. |
+| `/icon-composer:authoring` | "make an icon", "change the icon's dark-mode color", authoring or editing any `icon.json` property | Either creates a fresh `.icon` via the bundled `create_icon.py` CLI, or edits an existing `icon.json` in place and re-validates. Covers all schema categories — fills, blend modes, shadows, translucency, LiquidGlass, layouts, specializations. |
 | `/icon-composer:validate` | "check this icon", "why won't Icon Composer open this" | Runs `jsonschema` against `icon.json`, cross-checks referenced assets against `Assets/` on disk, and explains failures in terms of the schema. |
 
 Both skills shell out to small Python CLIs bundled with the plugin and managed with [uv](https://docs.astral.sh/uv/). Each skill's preflight stops with an error if `uv` is not on `PATH`.
@@ -42,7 +42,7 @@ Both skills shell out to small Python CLIs bundled with the plugin and managed w
 │   └── icon-composer/
 │       ├── .claude-plugin/plugin.json
 │       ├── skills/
-│       │   ├── create/SKILL.md
+│       │   ├── authoring/SKILL.md
 │       │   └── validate/SKILL.md
 │       ├── scripts/
 │       │   ├── create_icon.py

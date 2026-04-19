@@ -122,4 +122,4 @@ When Icon Composer refuses to open a file the schema considers valid, the usual 
 
 ## Related skill
 
-To author a fresh `.icon` or add a specialization to an existing one, use the sibling skill `icon-composer:create`.
+To author a fresh `.icon`, add a specialization to an existing one, or change any field of an existing `icon.json`, use the sibling skill `icon-composer:authoring`.

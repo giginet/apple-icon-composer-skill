@@ -1,9 +1,9 @@
 ---
-name: create
-description: Create a new Apple Icon Composer `.icon` package by writing an `icon.json` document and bundling image assets. Use this when the user asks to generate an app icon in the Icon Composer format, scaffold a `.icon` from parameters, set up light/dark/tinted appearance variants (specializations), or author any field of the `icon.json` schema — fills, blend modes, shadows, translucency, LiquidGlass Mode/Specular/Blur, or layer layouts.
+name: authoring
+description: Author an Apple Icon Composer `.icon` package — either by creating a new one from scratch or by editing an existing one in place. Use this when the user asks to generate an app icon, scaffold a `.icon` from parameters, set up light/dark/tinted appearance variants (specializations), or change any field of an existing `icon.json` — fills, blend modes, shadows, translucency, LiquidGlass Mode/Specular/Blur, layer layouts, or asset filenames.
 ---
 
-# Create an Icon Composer `.icon` package
+# Author an Icon Composer `.icon` package
 
 ## Preflight: confirm `uv` is installed
 
@@ -11,9 +11,12 @@ Before running any commands from this skill, execute `which uv`. If it exits non
 
 ## Overview
 
-A `.icon` is a directory (macOS document package) containing a declarative `icon.json` and an `Assets/` folder. This skill bundles a Python CLI at `${CLAUDE_PLUGIN_ROOT}/scripts/create_icon.py` that writes the package atomically, validates the JSON against `icon-schema.json` before writing, and verifies every referenced `image-name` has a matching asset file.
+A `.icon` is a directory (macOS document package) containing a declarative `icon.json` and an `Assets/` folder. This skill covers both workflows:
 
-## Invocation
+- **Create** a new `.icon` from an `icon.json` document and asset files using the bundled `${CLAUDE_PLUGIN_ROOT}/scripts/create_icon.py` CLI, which validates against `icon-schema.json` before writing and checks every referenced `image-name` against the supplied `--asset` map.
+- **Edit** an existing `.icon` in place by rewriting `icon.json` directly with the Edit tool and re-running `${CLAUDE_PLUGIN_ROOT}/scripts/validate_icon.py` (provided by the sibling `icon-composer:validate` skill). Asset file changes happen by replacing files inside `Assets/` on disk.
+
+## Creating a new `.icon`
 
 ```bash
 cd ${CLAUDE_PLUGIN_ROOT}
@@ -34,6 +37,24 @@ Flags:
 | `--asset NAME=PATH` | Register one image asset. Repeat for each `image-name` referenced in the document. `NAME` is the filename inside `Assets/`; `PATH` is the source file on disk. |
 | `--force` | Overwrite `--output` if it already exists. |
 | `--no-validate` | Skip JSON Schema validation (rarely what you want). |
+
+## Editing an existing `.icon`
+
+There is no `update` subcommand. Because `icon.json` is just JSON and the schema is well-defined, edit the file in place with the Edit tool and then re-validate:
+
+1. `Read` the current `<pkg>.icon/icon.json` to see what's there.
+2. Use the `Edit` tool to change exactly the field(s) the user asked about — a color string, a blend-mode enum, a `position.scale`, a specialization entry, etc. Refer to the schema sections below for allowed values.
+3. If an asset image needs to change, overwrite the file in `<pkg>.icon/Assets/` (same filename → no `image-name` edit needed; new filename → update every `image-name` / `image-name-specializations.value` that referenced the old name and place the new asset in `Assets/`).
+4. Run the validator on the whole package so both the schema and the asset-reference cross-check pass:
+
+    ```bash
+    cd ${CLAUDE_PLUGIN_ROOT}
+    uv run python scripts/validate_icon.py /path/to/Foo.icon
+    ```
+
+5. If validation fails, the `icon-composer:validate` skill explains how to read the output.
+
+Prefer minimal, targeted edits — keep keys in their existing order, don't reformat the file, and only add a `-specializations` array when the user actually wants a per-appearance override. The `create_icon.py` CLI's output format (`sort_keys=True`, 2-space indent) is the target style if the file is being re-written wholesale.
 
 ## Canvas and asset sizing
 

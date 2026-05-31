@@ -10,7 +10,8 @@ import pytest
 from create_icon import _parse_asset, main
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# tests/ -> scripts -> apple-icon-composer -> skills -> icon-composer -> plugins -> repo root
+REPO_ROOT = Path(__file__).resolve().parents[6]
 FIXTURES = REPO_ROOT / "fixtures"
 SIMPLE = FIXTURES / "simple-image.icon"
 SIMPLE_ICON_JSON = SIMPLE / "icon.json"

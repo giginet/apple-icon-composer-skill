@@ -1,27 +1,36 @@
 ---
-name: authoring
-description: Author an Apple Icon Composer `.icon` package — either by creating a new one from scratch or by editing an existing one in place. Use this when the user asks to generate an app icon, scaffold a `.icon` from parameters, set up light/dark/tinted appearance variants (specializations), or change any field of an existing `icon.json` — fills, blend modes, shadows, translucency, LiquidGlass Mode/Specular/Blur, layer layouts, or asset filenames.
+name: apple-icon-composer
+description: Author and validate Apple Icon Composer `.icon` packages. Use this when the user asks to generate an app icon, scaffold a `.icon` from parameters, set up light/dark/tinted appearance variants (specializations), change any field of an existing `icon.json` (fills, blend modes, shadows, translucency, LiquidGlass Mode/Specular/Blur, layer layouts, asset filenames), or validate/diagnose a `.icon` package or standalone `icon.json` against the bundled JSON Schema.
 ---
 
-# Author an Icon Composer `.icon` package
+# Apple Icon Composer `.icon` packages
+
+A `.icon` is a directory (macOS document package) containing a declarative `icon.json` and an `Assets/` folder. This skill **authors** new packages, **edits** existing ones in place, and **validates** them against the bundled JSON Schema. All three workflows share one bundled `uv` project.
 
 ## Preflight: confirm `uv` is installed
 
-Before running any commands from this skill, execute `which uv`. If it exits non-zero (no `uv` on PATH), stop and report the error to the user — this skill requires `uv`. Do not fall back to a system `python3`; the bundled `pyproject.toml` pins `requires-python = ">=3.9"` and dependency versions via `uv.lock`.
+Before running any commands, execute `which uv`. If it exits non-zero (no `uv` on PATH), stop and report the error to the user — this skill requires `uv`. Do not fall back to a system `python3`; the bundled `pyproject.toml` pins `requires-python = ">=3.9"` and dependency versions via `uv.lock`.
 
-## Overview
+## Running the bundled CLIs
 
-A `.icon` is a directory (macOS document package) containing a declarative `icon.json` and an `Assets/` folder. This skill covers both workflows:
+The two Python CLIs (`create_icon.py`, `validate_icon.py`), the `icon-schema.json` they validate against, and the `pyproject.toml` / `uv.lock` that pin their dependencies all live together in this skill's **`scripts/`** directory, which is a self-contained `uv` project. Run every command from inside it:
 
-- **Create** a new `.icon` from an `icon.json` document and asset files using the bundled `${CLAUDE_PLUGIN_ROOT}/scripts/create_icon.py` CLI, which validates against `icon-schema.json` before writing and checks every referenced `image-name` against the supplied `--asset` map.
-- **Edit** an existing `.icon` in place by rewriting `icon.json` directly with the Edit tool and re-running `${CLAUDE_PLUGIN_ROOT}/scripts/validate_icon.py` (provided by the sibling `icon-composer:validate` skill). Asset file changes happen by replacing files inside `Assets/` on disk.
+```bash
+# Claude Code / Codex plugin install:
+cd "${CLAUDE_PLUGIN_ROOT}/skills/apple-icon-composer/scripts"
+# gh skill install: cd into the scripts/ directory next to this SKILL.md instead.
+
+uv sync                                  # once, to populate .venv from uv.lock
+uv run python create_icon.py   ...       # author a new .icon
+uv run python validate_icon.py ...       # validate a .icon or icon.json
+```
+
+The rest of this document shows commands as `uv run python <script>.py ...` — always run them from that `scripts/` directory.
 
 ## Creating a new `.icon`
 
 ```bash
-cd ${CLAUDE_PLUGIN_ROOT}
-uv sync                                               # once, to populate .venv
-uv run python scripts/create_icon.py \
+uv run python create_icon.py \
     --output /path/to/Foo.icon \
     --icon /path/to/icon.json \
     --asset star.png=/path/to/star.png \
@@ -38,6 +47,8 @@ Flags:
 | `--force` | Overwrite `--output` if it already exists. |
 | `--no-validate` | Skip JSON Schema validation (rarely what you want). |
 
+`create_icon.py` validates against `icon-schema.json` before writing and checks every referenced `image-name` against the supplied `--asset` map.
+
 ## Editing an existing `.icon`
 
 There is no `update` subcommand. Because `icon.json` is just JSON and the schema is well-defined, edit the file in place with the Edit tool and then re-validate:
@@ -45,16 +56,76 @@ There is no `update` subcommand. Because `icon.json` is just JSON and the schema
 1. `Read` the current `<pkg>.icon/icon.json` to see what's there.
 2. Use the `Edit` tool to change exactly the field(s) the user asked about — a color string, a blend-mode enum, a `position.scale`, a specialization entry, etc. Refer to the schema sections below for allowed values.
 3. If an asset image needs to change, overwrite the file in `<pkg>.icon/Assets/` (same filename → no `image-name` edit needed; new filename → update every `image-name` / `image-name-specializations.value` that referenced the old name and place the new asset in `Assets/`).
-4. Run the validator on the whole package so both the schema and the asset-reference cross-check pass:
+4. Re-validate the whole package so both the schema and the asset-reference cross-check pass:
 
     ```bash
-    cd ${CLAUDE_PLUGIN_ROOT}
-    uv run python scripts/validate_icon.py /path/to/Foo.icon
+    uv run python validate_icon.py /path/to/Foo.icon
     ```
 
-5. If validation fails, the `icon-composer:validate` skill explains how to read the output.
-
 Prefer minimal, targeted edits — keep keys in their existing order, don't reformat the file, and only add a `-specializations` array when the user actually wants a per-appearance override. The `create_icon.py` CLI's output format (`sort_keys=True`, 2-space indent) is the target style if the file is being re-written wholesale.
+
+## Validating a `.icon` or `icon.json`
+
+```bash
+uv run python validate_icon.py /path/to/Foo.icon
+# or, for a bare document:
+uv run python validate_icon.py /path/to/icon.json
+```
+
+`validate_icon.py`:
+
+1. Parses `icon.json` and checks it against `icon-schema.json` using `jsonschema` (Draft 2020-12).
+2. Reports every schema violation with a JSON pointer and the validator's message.
+3. When pointed at a `.icon` directory, cross-checks every `image-name` and `image-name-specializations.value` against the files in `Assets/`, reporting both missing and orphaned files.
+
+| Flag | Meaning |
+|---|---|
+| _(positional)_ | Either a `.icon` directory or an `icon.json` file. |
+| `--skip-assets` | Do not cross-check `image-name` references against `Assets/`. |
+
+Exit codes: **0** = valid, **1** = schema or asset violation, **2** = bad input path.
+
+### Reading the output
+
+**Valid result:**
+
+```
+VALID: /path/to/Foo.icon/icon.json
+```
+
+A non-fatal warning may follow when some files in `Assets/` are not referenced by any layer:
+
+```
+warning: 2 unused asset(s) in Assets/: old-dark.png, old-light.png
+```
+
+**Schema errors** look like:
+
+```
+INVALID: /path/to/Foo.icon/icon.json (3 error(s))
+  at /groups/0/layers/0
+    Additional properties are not allowed ('fil' was unexpected)
+  at /groups/0/shadow/kind
+    'Natural' is not one of ['neutral', 'layer-color', 'none']
+  at /groups/0/layers/1
+    {'image-name-specializations': ...} is not valid under any of the given schemas
+```
+
+**Missing asset errors** look like:
+
+```
+INVALID: /path/to/Foo.icon has 1 missing asset(s)
+  Assets/symbol-dark.png is referenced but not on disk
+```
+
+### Common failure patterns
+
+Every message below is produced by `jsonschema` and maps back to a specific rule in `icon-schema.json`.
+
+- **`Additional properties are not allowed`** — an unrecognized key (typo, wrong case, or a UI label written as JSON). First suspects: `shadow.kind` set to `"Natural"/"Chromatic"/"Off"` (use `"neutral"/"layer-color"/"none"`); a `-specialization` (singular) array (the key is always `-specializations` plural); typos like `"ligthing"`.
+- **`'X' is not one of [...]`** — enum mismatch; see the enum table below.
+- **`is not valid under any of the given schemas`** — a `fill` object, specialization `value`, or `image-name` choice failed every `oneOf`/`anyOf` branch. A `fill` must have exactly one of `solid`/`automatic-gradient`/`linear-gradient`; a `fill-specializations` entry's `value` may be a fill object _or_ the literal string `"automatic"`; a layer must contain either `image-name` (string) or `image-name-specializations` (array).
+- **`'X' is a required property`** — a required field is missing: `groups` and `supported-platforms` at top level; `name` on every layer; `shadow.kind`/`shadow.opacity`/`translucency.enabled`/`translucency.value` when the parent object is present.
 
 ## Canvas and asset sizing
 
@@ -172,7 +243,7 @@ cat > /tmp/icon.json <<'JSON'
 }
 JSON
 
-uv run python scripts/create_icon.py \
+uv run python create_icon.py \
     --output /tmp/Hello.icon \
     --icon /tmp/icon.json \
     --asset symbol.png=/path/to/symbol-1024.png
@@ -211,9 +282,10 @@ jq -r '
 
 Use this to build the `--asset` flags for `create_icon.py` when retrofitting an existing document.
 
-## Gotchas when authoring for Icon Composer
+## Gotchas
 
 - Use JSON values, not UI labels (`"neutral"` not `"Natural"`, `"layer-color"` not `"Chromatic"`).
 - Do not emit `position` blocks with identity values (`scale: 1`, `translation-in-points: [0, 0]`) — Icon Composer's own save output omits them.
 - On a single layer, use either `fill` _or_ `fill-specializations`, not both. The same pattern holds for the other `X`/`X-specializations` pairs: put a no-`appearance` entry in the specializations array for the light case.
-- Every `image-name` (and every `image-name-specializations.value`) must map to a file supplied via `--asset`.
+- Every `image-name` (and every `image-name-specializations.value`) must map to a file in `Assets/` (supplied via `--asset` when creating).
+- Icon Composer fails fast on the first unknown value, so re-validate after fixing each error. The schema does not check image dimensions, but Icon Composer is designed around 1024 × 1024 point assets.

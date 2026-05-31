@@ -9,9 +9,9 @@ The **icon-composer** plugin — tools to create and validate Apple [Icon Compos
 
 ## Install
 
-Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the host you use — each path installs the same two skills.
+Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the host you use — each path installs the same `apple-icon-composer` skill.
 
-**Prerequisite:** [uv](https://docs.astral.sh/uv/) on your `PATH` (the skills run their bundled Python CLIs through it) — `brew install uv`.
+**Prerequisite:** [uv](https://docs.astral.sh/uv/) on your `PATH` (the skill runs its bundled Python CLIs through it) — `brew install uv`.
 
 ### Claude Code
 
@@ -20,7 +20,7 @@ Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the ho
 /plugin install icon-composer@icon-composer
 ```
 
-Then run `/reload-plugins` once and confirm with `/` — you should see `/icon-composer:authoring` and `/icon-composer:validate`. The `@icon-composer` suffix names the marketplace declared in `.claude-plugin/marketplace.json`, disambiguating it from any other marketplaces you have installed.
+Then run `/reload-plugins` once and confirm with `/` — you should see `/icon-composer:apple-icon-composer`. The `@icon-composer` suffix names the marketplace declared in `.claude-plugin/marketplace.json`, disambiguating it from any other marketplaces you have installed.
 
 ### Codex
 
@@ -29,7 +29,7 @@ codex plugin marketplace add giginet/apple-icon-composer-skill
 # then open the plugin directory in Codex, pick the "Icon Composer" marketplace, and install
 ```
 
-Backed by the repo marketplace at `.agents/plugins/marketplace.json` with the manifest at `plugins/icon-composer/.codex-plugin/plugin.json`. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the bundled `${CLAUDE_PLUGIN_ROOT}/scripts/...` references work unchanged.
+Backed by the repo marketplace at `.agents/plugins/marketplace.json` with the manifest at `plugins/icon-composer/.codex-plugin/plugin.json`. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the skill's `${CLAUDE_PLUGIN_ROOT}/skills/apple-icon-composer/scripts/...` references work unchanged.
 
 ### GitHub CLI (`gh skill`)
 
@@ -39,24 +39,22 @@ Requires GitHub CLI v2.90.0+.
 # Browse and pick interactively
 gh skill install giginet/apple-icon-composer-skill
 
-# Or install a specific skill for a given host
-gh skill install giginet/apple-icon-composer-skill authoring --agent claude-code
-gh skill install giginet/apple-icon-composer-skill validate --agent claude-code
+# Or install it directly for a given host
+gh skill install giginet/apple-icon-composer-skill apple-icon-composer --agent claude-code
 ```
 
-> [!NOTE]
-> `gh skill` copies only the skill directory (`SKILL.md`). The bundled Python CLIs (`create_icon.py`, `validate_icon.py`) and `icon-schema.json` live at the plugin root, so the full create/validate workflow needs the Claude Code or Codex plugin install above. Use `gh skill` when you want the skill instructions on another agent host.
+The skill is self-contained: its `scripts/` directory is a `uv` project bundling `create_icon.py`, `validate_icon.py`, `icon-schema.json`, and `uv.lock`, so `gh skill` copies the whole working toolset — not just the instructions. Outside a plugin host, `${CLAUDE_PLUGIN_ROOT}` is unset, so run the CLIs from the installed skill's `scripts/` directory (the `SKILL.md` explains this); `uv` is still required.
 
-## Skills
+## Skill
 
-Once installed, two skills are available:
+One skill, `apple-icon-composer`, covers both authoring and validation:
 
-| Skill | Triggers on | What it does |
-|---|---|---|
-| `/icon-composer:authoring` | "make an icon", "change the icon's dark-mode color", authoring or editing any `icon.json` property | Either creates a fresh `.icon` via the bundled `create_icon.py` CLI, or edits an existing `icon.json` in place and re-validates. Covers all schema categories — fills, blend modes, shadows, translucency, LiquidGlass, layouts, specializations. |
-| `/icon-composer:validate` | "check this icon", "why won't Icon Composer open this" | Runs `jsonschema` against `icon.json`, cross-checks referenced assets against `Assets/` on disk, and explains failures in terms of the schema. |
+| Triggers on | What it does |
+|---|---|
+| "make an icon", "change the icon's dark-mode color", authoring or editing any `icon.json` property | Creates a fresh `.icon` via the bundled `create_icon.py` CLI, or edits an existing `icon.json` in place and re-validates. Covers all schema categories — fills, blend modes, shadows, translucency, LiquidGlass, layouts, specializations. |
+| "check this icon", "why won't Icon Composer open this" | Runs `jsonschema` against `icon.json` via `validate_icon.py`, cross-checks referenced assets against `Assets/` on disk, and explains failures in terms of the schema. |
 
-Both skills shell out to small Python CLIs bundled with the plugin and managed with [uv](https://docs.astral.sh/uv/). Each skill's preflight stops with an error if `uv` is not on `PATH`.
+The skill shells out to two small Python CLIs bundled in its `scripts/` directory (a [uv](https://docs.astral.sh/uv/) project). Its preflight stops with an error if `uv` is not on `PATH`.
 
 ## Repo layout
 
@@ -71,43 +69,44 @@ Both skills shell out to small Python CLIs bundled with the plugin and managed w
 │   └── icon-composer/
 │       ├── .claude-plugin/plugin.json   Claude Code manifest
 │       ├── .codex-plugin/plugin.json    Codex manifest (skills: "./skills/")
-│       ├── skills/                      canonical skill sources (kept inside the plugin)
-│       │   ├── authoring/SKILL.md
-│       │   └── validate/SKILL.md
-│       ├── scripts/
-│       │   ├── create_icon.py
-│       │   └── validate_icon.py
-│       ├── tests/                       pytest suite for both scripts
-│       ├── icon-schema.json             source of truth for icon.json
-│       ├── pyproject.toml               uv-managed deps: jsonschema, pillow, pytest (dev)
-│       └── uv.lock
+│       └── skills/
+│           └── apple-icon-composer/
+│               ├── SKILL.md             authoring + validation instructions
+│               └── scripts/             self-contained uv project
+│                   ├── create_icon.py
+│                   ├── validate_icon.py
+│                   ├── icon-schema.json source of truth for icon.json
+│                   ├── pyproject.toml   uv-managed deps: jsonschema, pillow, pytest (dev)
+│                   ├── uv.lock
+│                   └── tests/           pytest suite for both CLIs
 ├── fixtures/                            example .icon packages — simple-image, variables-changed, complex-icon, test-generated, plugin-test
 └── README.md
 ```
 
-The canonical skill sources live **inside** `plugins/icon-composer/skills/` so that both the Claude Code and Codex plugins stay self-contained when a host copies the plugin directory. The top-level `skills` symlink points back into the plugin; `gh skill` discovers the skills remotely via the nested `plugins/icon-composer/skills/*/SKILL.md` path, so the symlink only matters for local `gh skill --from-local` runs.
+The skill is self-contained: the CLIs, schema, and their `uv` project all live in `plugins/icon-composer/skills/apple-icon-composer/scripts/`, so every host — Claude Code, Codex, or `gh skill` — gets the full toolset when it copies the skill directory, with no shared files outside it. The top-level `skills` symlink points back into the plugin for local `gh skill --from-local` runs; remote `gh skill` discovers the skill via the nested `plugins/icon-composer/skills/*/SKILL.md` path.
 
-## Hacking on the plugin locally
+## Hacking on the skill locally
 
 ```sh
-cd plugins/icon-composer
+cd plugins/icon-composer/skills/apple-icon-composer/scripts
 uv sync                          # installs runtime + dev (pytest) dependencies
 
 # Run the unit tests
 uv run pytest
 
 # Validate every example fixture by hand
-for f in ../../fixtures/*.icon; do
-    uv run python scripts/validate_icon.py "$f"
+for f in ../../../../../fixtures/*.icon; do
+    uv run python validate_icon.py "$f"
 done
 
 # Round-trip: copy a fixture through the create CLI and re-validate
-uv run python scripts/create_icon.py \
+FIX=../../../../../fixtures/simple-image.icon
+uv run python create_icon.py \
     --output /tmp/smoke.icon \
-    --icon ../../fixtures/simple-image.icon/icon.json \
-    --asset video.fill.png=../../fixtures/simple-image.icon/Assets/video.fill.png \
+    --icon "$FIX/icon.json" \
+    --asset video.fill.png="$FIX/Assets/video.fill.png" \
     --force
-uv run python scripts/validate_icon.py /tmp/smoke.icon
+uv run python validate_icon.py /tmp/smoke.icon
 ```
 
 `icon-schema.json` is the authoritative definition of the `icon.json` format — including per-appearance `-specializations` overrides, the LiquidGlass property set on groups, and the enum values Icon Composer's UI labels quietly map to (for example, Shadow `"Natural"` → `"neutral"`, `"Chromatic"` → `"layer-color"`).

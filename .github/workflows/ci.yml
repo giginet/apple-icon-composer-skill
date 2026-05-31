@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: plugins/icon-composer
+        working-directory: plugins/icon-composer/skills/apple-icon-composer/scripts
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +18,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-          cache-dependency-glob: plugins/icon-composer/uv.lock
+          cache-dependency-glob: plugins/icon-composer/skills/apple-icon-composer/scripts/uv.lock
 
       - name: Install dependencies
         run: uv sync --locked

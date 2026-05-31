@@ -8,7 +8,8 @@ import pytest
 from validate_icon import main
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# tests/ -> scripts -> apple-icon-composer -> skills -> icon-composer -> plugins -> repo root
+REPO_ROOT = Path(__file__).resolve().parents[6]
 FIXTURES = REPO_ROOT / "fixtures"
 
 

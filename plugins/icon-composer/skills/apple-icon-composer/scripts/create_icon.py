@@ -11,8 +11,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-PLUGIN_ROOT = Path(__file__).resolve().parent.parent
-SCHEMA_PATH = PLUGIN_ROOT / "icon-schema.json"
+SCHEMA_PATH = Path(__file__).resolve().parent / "icon-schema.json"
 
 
 def _parse_asset(spec: str) -> tuple[str, Path]:

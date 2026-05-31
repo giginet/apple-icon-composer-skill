@@ -1,6 +1,10 @@
 # icon-composer-mcp
 
-A personal [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-code/plugins) hosting the **icon-composer** plugin — tools to create and validate Apple [Icon Composer](https://developer.apple.com/icon-composer/) `.icon` packages.
+[![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-D97757?logo=anthropic&logoColor=white)](#from-github)
+[![Codex](https://img.shields.io/badge/Codex-plugin-10A37F?logo=openai&logoColor=white)](#from-codex)
+[![gh skill](https://img.shields.io/badge/gh_skill-install-1F2328?logo=github&logoColor=white)](#with-the-github-cli-gh-skill)
+
+A personal [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-code/plugins) hosting the **icon-composer** plugin — tools to create and validate Apple [Icon Composer](https://developer.apple.com/icon-composer/) `.icon` packages. The same package installs as a [Codex plugin](https://developers.openai.com/codex/plugins) and as a standalone skill via [`gh skill`](https://cli.github.com/manual/gh_skill_install).
 
 ## Install
 

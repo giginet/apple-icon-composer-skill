@@ -1,5 +1,6 @@
 # icon-composer-mcp
 
+[![CI](https://github.com/giginet/apple-icon-composer-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/giginet/apple-icon-composer-skill/actions/workflows/ci.yml)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-D97757?logo=anthropic&logoColor=white)](#from-github)
 [![Codex](https://img.shields.io/badge/Codex-plugin-10A37F?logo=openai&logoColor=white)](#from-codex)
 [![gh skill](https://img.shields.io/badge/gh_skill-install-1F2328?logo=github&logoColor=white)](#with-the-github-cli-gh-skill)

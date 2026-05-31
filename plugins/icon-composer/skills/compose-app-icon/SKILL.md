@@ -154,7 +154,7 @@ A group shares the same LiquidGlass rendering pipeline across its layers and car
 | `blur` | number 0–1 | **Blur** | Background blur amount. |
 | `translucency` | `{ enabled: bool, value: number }` | Translucency | |
 | `shadow` | `{ kind: string, opacity: number }` | Shadow | See the UI ↔ JSON table below. |
-| `position` | `{ scale?: number, translation-in-points?: [x, y] }` | Composition.Layout | Omit when identity. |
+| `position` | `{ scale: number, translation-in-points: [x, y] }` | Composition.Layout | Omit when identity; otherwise include **both** keys (see gotchas). |
 
 ### Layers — image-backed records inside a group
 
@@ -285,7 +285,8 @@ Use this to build the `--asset` flags for `create_icon.py` when retrofitting an 
 ## Gotchas
 
 - Use JSON values, not UI labels (`"neutral"` not `"Natural"`, `"layer-color"` not `"Chromatic"`).
-- Do not emit `position` blocks with identity values (`scale: 1`, `translation-in-points: [0, 0]`) — Icon Composer's own save output omits them.
+- A `position` object must carry **both** `scale` and `translation-in-points`. A scale-only `position` validates against older schemas but Icon Composer 1.5 refuses to open the package (`The document … could not be opened. The data is missing.`); always pair `scale` with `translation-in-points` (use `[0, 0]` when there is no offset).
+- Do not emit `position` blocks with identity values (`scale: 1`, `translation-in-points: [0, 0]`) — Icon Composer's own save output omits them. Omit the whole object rather than writing a partial one.
 - On a single layer, use either `fill` _or_ `fill-specializations`, not both. The same pattern holds for the other `X`/`X-specializations` pairs: put a no-`appearance` entry in the specializations array for the light case.
 - Every `image-name` (and every `image-name-specializations.value`) must map to a file in `Assets/` (supplied via `--asset` when creating).
 - Icon Composer fails fast on the first unknown value, so re-validate after fixing each error. The schema does not check image dimensions, but Icon Composer is designed around 1024 × 1024 point assets.

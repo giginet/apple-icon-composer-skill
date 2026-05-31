@@ -1,6 +1,7 @@
 ---
 name: compose-app-icon
 description: Author and validate Apple Icon Composer `.icon` packages. Use this when the user asks to generate an app icon, scaffold a `.icon` from parameters, set up light/dark/tinted appearance variants (specializations), change any field of an existing `icon.json` (fills, blend modes, shadows, translucency, LiquidGlass Mode/Specular/Blur, layer layouts, asset filenames), or validate/diagnose a `.icon` package or standalone `icon.json` against the bundled JSON Schema.
+license: Apache-2.0
 ---
 
 # Apple Icon Composer `.icon` packages

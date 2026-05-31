@@ -186,7 +186,7 @@
     },
     "position": {
       "type": "object",
-      "description": "Position and scale adjustments for a layer",
+      "description": "Position and scale adjustments for a layer. When present, both 'scale' and 'translation-in-points' are required: Icon Composer 1.5 refuses to open a package whose position omits 'translation-in-points'. Omit the whole 'position' object for the identity transform (scale 1, no translation).",
       "properties": {
         "scale": {
           "type": "number",
@@ -201,6 +201,7 @@
           "maxItems": 2
         }
       },
+      "required": ["scale", "translation-in-points"],
       "additionalProperties": false
     },
     "blend-mode": {

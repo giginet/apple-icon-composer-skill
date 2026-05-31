@@ -4,7 +4,7 @@ A personal [Claude Code plugin marketplace](https://docs.claude.com/en/docs/clau
 
 ## Install
 
-This repo is published at <https://github.com/giginet/icon-composer-agent-skill>. The snippets below are all run inside a Claude Code session.
+This repo is published at <https://github.com/giginet/icon-composer-agent-skill>. It can be installed as a Claude Code plugin, a Codex plugin, or a standalone skill via the GitHub CLI — see the sections below.
 
 ### From GitHub
 
@@ -21,9 +21,20 @@ The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; t
 
 Run `/reload-plugins` once so Claude Code picks up the new skills. You can confirm they are active by typing `/` and looking for `/icon-composer:authoring` and `/icon-composer:validate` in the list.
 
+### From Codex
+
+The same plugin is exposed to [Codex](https://developers.openai.com/codex/plugins) through a repo marketplace at `.agents/plugins/marketplace.json` (manifest at `plugins/icon-composer/.codex-plugin/plugin.json`):
+
+```sh
+codex plugin marketplace add giginet/icon-composer-agent-skill
+# then open the plugin directory in Codex, pick the "Icon Composer" marketplace, and install
+```
+
+Codex copies the plugin directory into its cache on install, so the skills live **inside** `plugins/icon-composer/skills/` (a real directory) to keep the plugin self-contained. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the same `${CLAUDE_PLUGIN_ROOT}/scripts/...` references work there too.
+
 ### With the GitHub CLI (`gh skill`)
 
-The skills are also published at the top-level `skills/` directory, so they can be installed directly with [`gh skill`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+):
+The skills can also be installed directly with [`gh skill`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+). `gh skill` discovers them via the `skills/*/SKILL.md` convention even though they are nested under the plugin prefix:
 
 ```sh
 # Browse and pick interactively
@@ -53,14 +64,17 @@ Both skills shell out to small Python CLIs bundled with the plugin and managed w
 ```
 .
 ├── .claude-plugin/
-│   └── marketplace.json                 marketplace index (points at plugins/)
-├── skills/                              canonical skill sources (top-level for `gh skill install`)
-│   ├── authoring/SKILL.md
-│   └── validate/SKILL.md
+│   └── marketplace.json                 Claude Code marketplace index (points at plugins/)
+├── .agents/plugins/
+│   └── marketplace.json                 Codex repo marketplace (points at plugins/)
+├── skills -> plugins/icon-composer/skills   symlink for top-level `gh skill --from-local`
 ├── plugins/
 │   └── icon-composer/
-│       ├── .claude-plugin/plugin.json
-│       ├── skills -> ../../skills       symlink so Claude Code loads the same skills
+│       ├── .claude-plugin/plugin.json   Claude Code manifest
+│       ├── .codex-plugin/plugin.json    Codex manifest (skills: "./skills/")
+│       ├── skills/                      canonical skill sources (kept inside the plugin)
+│       │   ├── authoring/SKILL.md
+│       │   └── validate/SKILL.md
 │       ├── scripts/
 │       │   ├── create_icon.py
 │       │   └── validate_icon.py
@@ -71,6 +85,8 @@ Both skills shell out to small Python CLIs bundled with the plugin and managed w
 ├── fixtures/                            example .icon packages — simple-image, variables-changed, complex-icon, test-generated, plugin-test
 └── README.md
 ```
+
+The canonical skill sources live **inside** `plugins/icon-composer/skills/` so that both the Claude Code and Codex plugins stay self-contained when a host copies the plugin directory. The top-level `skills` symlink points back into the plugin; `gh skill` discovers the skills remotely via the nested `plugins/icon-composer/skills/*/SKILL.md` path, so the symlink only matters for local `gh skill --from-local` runs.
 
 ## Hacking on the plugin locally
 

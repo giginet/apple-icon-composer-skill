@@ -1,0 +1,20 @@
+{
+  "name": "icon-composer",
+  "interface": {
+    "displayName": "Icon Composer"
+  },
+  "plugins": [
+    {
+      "name": "icon-composer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/icon-composer"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

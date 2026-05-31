@@ -1,0 +1,17 @@
+{
+  "name": "icon-composer",
+  "version": "0.1.0",
+  "description": "Create and validate Apple Icon Composer .icon packages.",
+  "author": { "name": "giginet" },
+  "homepage": "https://github.com/giginet/icon-composer-agent-skill",
+  "repository": "https://github.com/giginet/icon-composer-agent-skill",
+  "keywords": ["icon", "apple", "icon-composer", "macos", "appicon"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Icon Composer",
+    "shortDescription": "Create and validate Apple Icon Composer .icon packages",
+    "longDescription": "Author and validate Apple Icon Composer .icon packages: scaffold a new icon.json from parameters, edit any field in place, set up light/dark/tinted appearance variants, and check a package against the bundled JSON Schema.",
+    "developerName": "giginet",
+    "category": "Developer Tools"
+  }
+}

@@ -127,6 +127,47 @@ Every message below is produced by `jsonschema` and maps back to a specific rule
 - **`is not valid under any of the given schemas`** — a `fill` object, specialization `value`, or `image-name` choice failed every `oneOf`/`anyOf` branch. A `fill` must have exactly one of `solid`/`automatic-gradient`/`linear-gradient`; a `fill-specializations` entry's `value` may be a fill object _or_ the literal string `"automatic"`; a layer must contain either `image-name` (string) or `image-name-specializations` (array).
 - **`'X' is a required property`** — a required field is missing: `groups` and `supported-platforms` at top level; `name` on every layer; `shadow.kind`/`shadow.opacity`/`translucency.enabled`/`translucency.value` when the parent object is present.
 
+## Ground-truth check & rendering with `ictool` (macOS + Xcode only)
+
+`validate_icon.py` checks the document against the JSON Schema, but the schema cannot model every constraint Icon Composer enforces at load time. When Xcode is installed, `ictool` — the command-line tool bundled inside `Icon Composer.app` — gives the authoritative answer by rendering the document the same way the app opens it, and as a bonus exports preview PNGs per platform / appearance.
+
+This is optional and macOS-only: it is unavailable on agent hosts without Xcode, so always run `validate_icon.py` first as the portable check, then use `ictool` as a final confirmation and to produce previews when it's present.
+
+### Locating `ictool`
+
+`xcode-select -p` prints the active Xcode's `Developer` directory (e.g. `/Applications/Xcode.app/Contents/Developer`); `ictool` lives one level up under `Applications/Icon Composer.app`:
+
+```bash
+ICTOOL="$(dirname "$(xcode-select -p)")/Applications/Icon Composer.app/Contents/Executables/ictool"
+[ -x "$ICTOOL" ] || { echo "ictool not found — Xcode 26+ with Icon Composer required"; }
+"$ICTOOL" --version          # {"bundle-version": "98", "short-bundle-version": "1.5"}
+```
+
+### Rendering a rendition (and validating by side effect)
+
+```bash
+"$ICTOOL" /path/to/Foo.icon \
+    --export-image --output-file /tmp/foo.png \
+    --platform iOS --rendition Default --width 1024 --height 1024 --scale 2
+```
+
+| Flag | Meaning |
+|---|---|
+| `--export-image` | The only operation; renders the document to `--output-file` (PNG). |
+| `--output-file PATH` | Where to write the rendered PNG. |
+| `--platform` | `iOS`, `macOS`, or `watchOS`. |
+| `--rendition` | `Default`, `Dark`, `TintedLight`, `TintedDark`, `ClearLight`, `ClearDark`. |
+| `--width` / `--height` / `--scale` | Output size in points × scale (e.g. `1024 1024 2` → 2048×2048 px). |
+| `--light-angle` | _(optional)_ lighting angle. |
+| `--tint-color` / `--tint-strength` | _(optional)_ tint for the `Tinted*` renditions; each takes a single value, e.g. `--tint-color 0.25 --tint-strength 0.75`. |
+
+There is **no separate validate subcommand** — validation is a side effect of rendering:
+
+- **Success** → exit `0`, prints `{}`, and writes the PNG. Icon Composer can open the document.
+- **Failure** → non-zero exit and `The data couldn't be read because it is missing.` (or a more specific message). Icon Composer would refuse to open it, even if `validate_icon.py` said `VALID`.
+
+So after authoring or editing, render the `Default` rendition (and `Dark` / a `Tinted*` one if the icon uses specializations) to confirm the package actually opens and to eyeball the result. This is exactly what catches engine-level issues the schema can't — for example a `position` with `scale` but no `translation-in-points`, which renders fine only once both keys are present.
+
 ## Canvas and asset sizing
 
 Icon Composer's design canvas is **1024 × 1024 points**. Image assets should be 1024 × 1024 PNG (or SVG) with the visible content centered; `position.translation-in-points` operates in this 1024-point coordinate system, so `[0, 0]` means no offset from the canvas center. Smaller assets render at their native size and look visually smaller than the canvas.

@@ -1,5 +1,5 @@
 ---
-name: apple-icon-composer
+name: compose-app-icon
 description: Author and validate Apple Icon Composer `.icon` packages. Use this when the user asks to generate an app icon, scaffold a `.icon` from parameters, set up light/dark/tinted appearance variants (specializations), change any field of an existing `icon.json` (fills, blend modes, shadows, translucency, LiquidGlass Mode/Specular/Blur, layer layouts, asset filenames), or validate/diagnose a `.icon` package or standalone `icon.json` against the bundled JSON Schema.
 ---
 
@@ -17,7 +17,7 @@ The two Python CLIs (`create_icon.py`, `validate_icon.py`), the `icon-schema.jso
 
 ```bash
 # Claude Code / Codex plugin install:
-cd "${CLAUDE_PLUGIN_ROOT}/skills/apple-icon-composer/scripts"
+cd "${CLAUDE_PLUGIN_ROOT}/skills/compose-app-icon/scripts"
 # gh skill install: cd into the scripts/ directory next to this SKILL.md instead.
 
 uv sync                                  # once, to populate .venv from uv.lock

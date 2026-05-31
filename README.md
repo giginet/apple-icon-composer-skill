@@ -9,7 +9,7 @@ The **icon-composer** plugin — tools to create and validate Apple [Icon Compos
 
 ## Install
 
-Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the host you use — each path installs the same `apple-icon-composer` skill.
+Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the host you use — each path installs the same `compose-app-icon` skill.
 
 **Prerequisite:** [uv](https://docs.astral.sh/uv/) on your `PATH` (the skill runs its bundled Python CLIs through it) — `brew install uv`.
 
@@ -20,7 +20,7 @@ Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the ho
 /plugin install icon-composer@icon-composer
 ```
 
-Then run `/reload-plugins` once and confirm with `/` — you should see `/icon-composer:apple-icon-composer`. The `@icon-composer` suffix names the marketplace declared in `.claude-plugin/marketplace.json`, disambiguating it from any other marketplaces you have installed.
+Then run `/reload-plugins` once and confirm with `/` — you should see `/icon-composer:compose-app-icon`. The `@icon-composer` suffix names the marketplace declared in `.claude-plugin/marketplace.json`, disambiguating it from any other marketplaces you have installed.
 
 ### Codex
 
@@ -29,7 +29,7 @@ codex plugin marketplace add giginet/apple-icon-composer-skill
 # then open the plugin directory in Codex, pick the "Icon Composer" marketplace, and install
 ```
 
-Backed by the repo marketplace at `.agents/plugins/marketplace.json` with the manifest at `plugins/icon-composer/.codex-plugin/plugin.json`. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the skill's `${CLAUDE_PLUGIN_ROOT}/skills/apple-icon-composer/scripts/...` references work unchanged.
+Backed by the repo marketplace at `.agents/plugins/marketplace.json` with the manifest at `plugins/icon-composer/.codex-plugin/plugin.json`. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the skill's `${CLAUDE_PLUGIN_ROOT}/skills/compose-app-icon/scripts/...` references work unchanged.
 
 ### GitHub CLI (`gh skill`)
 
@@ -40,14 +40,14 @@ Requires GitHub CLI v2.90.0+.
 gh skill install giginet/apple-icon-composer-skill
 
 # Or install it directly for a given host
-gh skill install giginet/apple-icon-composer-skill apple-icon-composer --agent claude-code
+gh skill install giginet/apple-icon-composer-skill compose-app-icon --agent claude-code
 ```
 
 The skill is self-contained: its `scripts/` directory is a `uv` project bundling `create_icon.py`, `validate_icon.py`, `icon-schema.json`, and `uv.lock`, so `gh skill` copies the whole working toolset — not just the instructions. Outside a plugin host, `${CLAUDE_PLUGIN_ROOT}` is unset, so run the CLIs from the installed skill's `scripts/` directory (the `SKILL.md` explains this); `uv` is still required.
 
 ## Skill
 
-One skill, `apple-icon-composer`, covers both authoring and validation:
+One skill, `compose-app-icon`, covers both authoring and validation:
 
 | Triggers on | What it does |
 |---|---|
@@ -70,7 +70,7 @@ The skill shells out to two small Python CLIs bundled in its `scripts/` director
 │       ├── .claude-plugin/plugin.json   Claude Code manifest
 │       ├── .codex-plugin/plugin.json    Codex manifest (skills: "./skills/")
 │       └── skills/
-│           └── apple-icon-composer/
+│           └── compose-app-icon/
 │               ├── SKILL.md             authoring + validation instructions
 │               └── scripts/             self-contained uv project
 │                   ├── create_icon.py
@@ -83,12 +83,12 @@ The skill shells out to two small Python CLIs bundled in its `scripts/` director
 └── README.md
 ```
 
-The skill is self-contained: the CLIs, schema, and their `uv` project all live in `plugins/icon-composer/skills/apple-icon-composer/scripts/`, so every host — Claude Code, Codex, or `gh skill` — gets the full toolset when it copies the skill directory, with no shared files outside it. The top-level `skills` symlink points back into the plugin for local `gh skill --from-local` runs; remote `gh skill` discovers the skill via the nested `plugins/icon-composer/skills/*/SKILL.md` path.
+The skill is self-contained: the CLIs, schema, and their `uv` project all live in `plugins/icon-composer/skills/compose-app-icon/scripts/`, so every host — Claude Code, Codex, or `gh skill` — gets the full toolset when it copies the skill directory, with no shared files outside it. The top-level `skills` symlink points back into the plugin for local `gh skill --from-local` runs; remote `gh skill` discovers the skill via the nested `plugins/icon-composer/skills/*/SKILL.md` path.
 
 ## Hacking on the skill locally
 
 ```sh
-cd plugins/icon-composer/skills/apple-icon-composer/scripts
+cd plugins/icon-composer/skills/compose-app-icon/scripts
 uv sync                          # installs runtime + dev (pytest) dependencies
 
 # Run the unit tests

@@ -11,8 +11,7 @@ The **icon-composer** plugin — tools to create and validate Apple [Icon Compos
 
 Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the host you use — each path installs the same two skills.
 
-> [!IMPORTANT]
-> All three install paths require [uv](https://docs.astral.sh/uv/) on your `PATH`. The skills run bundled Python CLIs through `uv`, and each skill's preflight stops with an error if `uv` is missing. Install it with `brew install uv` (or see the [uv install docs](https://docs.astral.sh/uv/getting-started/installation/)).
+**Prerequisite:** [uv](https://docs.astral.sh/uv/) on your `PATH` (the skills run their bundled Python CLIs through it) — `brew install uv`.
 
 ### Claude Code
 

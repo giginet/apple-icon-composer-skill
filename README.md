@@ -1,57 +1,52 @@
 # icon-composer-mcp
 
 [![CI](https://github.com/giginet/apple-icon-composer-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/giginet/apple-icon-composer-skill/actions/workflows/ci.yml)
-[![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-D97757?logo=anthropic&logoColor=white)](#from-github)
-[![Codex](https://img.shields.io/badge/Codex-plugin-10A37F?logo=openai&logoColor=white)](#from-codex)
-[![gh skill](https://img.shields.io/badge/gh_skill-install-1F2328?logo=github&logoColor=white)](#with-the-github-cli-gh-skill)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-D97757?logo=anthropic&logoColor=white)](#claude-code)
+[![Codex](https://img.shields.io/badge/Codex-plugin-10A37F?logo=openai&logoColor=white)](#codex)
+[![gh skill](https://img.shields.io/badge/gh_skill-install-1F2328?logo=github&logoColor=white)](#github-cli-gh-skill)
 
-A personal [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-code/plugins) hosting the **icon-composer** plugin — tools to create and validate Apple [Icon Composer](https://developer.apple.com/icon-composer/) `.icon` packages. The same package installs as a [Codex plugin](https://developers.openai.com/codex/plugins) and as a standalone skill via [`gh skill`](https://cli.github.com/manual/gh_skill_install).
+The **icon-composer** plugin — tools to create and validate Apple [Icon Composer](https://developer.apple.com/icon-composer/) `.icon` packages. The same package installs three ways: as a [Claude Code plugin](https://docs.claude.com/en/docs/claude-code/plugins), a [Codex plugin](https://developers.openai.com/codex/plugins), or a standalone skill via [`gh skill`](https://cli.github.com/manual/gh_skill_install).
 
 ## Install
 
-This repo is published at <https://github.com/giginet/apple-icon-composer-skill>. It can be installed as a Claude Code plugin, a Codex plugin, or a standalone skill via the GitHub CLI — see the sections below.
+Published at <https://github.com/giginet/apple-icon-composer-skill>. Pick the host you use — each path installs the same two skills.
 
-### From GitHub
+> [!IMPORTANT]
+> All three install paths require [uv](https://docs.astral.sh/uv/) on your `PATH`. The skills run bundled Python CLIs through `uv`, and each skill's preflight stops with an error if `uv` is missing. Install it with `brew install uv` (or see the [uv install docs](https://docs.astral.sh/uv/getting-started/installation/)).
+
+### Claude Code
 
 ```
 /plugin marketplace add giginet/apple-icon-composer-skill
 /plugin install icon-composer@icon-composer
 ```
 
-### About the `@icon-composer` suffix
+Then run `/reload-plugins` once and confirm with `/` — you should see `/icon-composer:authoring` and `/icon-composer:validate`. The `@icon-composer` suffix names the marketplace declared in `.claude-plugin/marketplace.json`, disambiguating it from any other marketplaces you have installed.
 
-The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; the `@icon-composer` after the plugin name disambiguates it from any other marketplaces you have installed.
-
-### After install
-
-Run `/reload-plugins` once so Claude Code picks up the new skills. You can confirm they are active by typing `/` and looking for `/icon-composer:authoring` and `/icon-composer:validate` in the list.
-
-### From Codex
-
-The same plugin is exposed to [Codex](https://developers.openai.com/codex/plugins) through a repo marketplace at `.agents/plugins/marketplace.json` (manifest at `plugins/icon-composer/.codex-plugin/plugin.json`):
+### Codex
 
 ```sh
 codex plugin marketplace add giginet/apple-icon-composer-skill
 # then open the plugin directory in Codex, pick the "Icon Composer" marketplace, and install
 ```
 
-Codex copies the plugin directory into its cache on install, so the skills live **inside** `plugins/icon-composer/skills/` (a real directory) to keep the plugin self-contained. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the same `${CLAUDE_PLUGIN_ROOT}/scripts/...` references work there too.
+Backed by the repo marketplace at `.agents/plugins/marketplace.json` with the manifest at `plugins/icon-composer/.codex-plugin/plugin.json`. Codex sets `CLAUDE_PLUGIN_ROOT` for compatibility, so the bundled `${CLAUDE_PLUGIN_ROOT}/scripts/...` references work unchanged.
 
-### With the GitHub CLI (`gh skill`)
+### GitHub CLI (`gh skill`)
 
-The skills can also be installed directly with [`gh skill`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+). `gh skill` discovers them via the `skills/*/SKILL.md` convention even though they are nested under the plugin prefix:
+Requires GitHub CLI v2.90.0+.
 
 ```sh
 # Browse and pick interactively
 gh skill install giginet/apple-icon-composer-skill
 
-# Or install a specific skill for Claude Code
+# Or install a specific skill for a given host
 gh skill install giginet/apple-icon-composer-skill authoring --agent claude-code
 gh skill install giginet/apple-icon-composer-skill validate --agent claude-code
 ```
 
 > [!NOTE]
-> `gh skill` copies only the skill directory (`SKILL.md`). The bundled Python CLIs (`create_icon.py`, `validate_icon.py`) and `icon-schema.json` live at the plugin root and are referenced via `${CLAUDE_PLUGIN_ROOT}`, so the full create/validate workflow still requires the plugin install above. Use `gh skill` when you want the skill instructions on a non-marketplace agent host.
+> `gh skill` copies only the skill directory (`SKILL.md`). The bundled Python CLIs (`create_icon.py`, `validate_icon.py`) and `icon-schema.json` live at the plugin root, so the full create/validate workflow needs the Claude Code or Codex plugin install above. Use `gh skill` when you want the skill instructions on another agent host.
 
 ## Skills
 

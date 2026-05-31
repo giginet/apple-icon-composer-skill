@@ -1,6 +1,6 @@
 {
   "name": "icon-composer",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "Create and validate Apple Icon Composer .icon packages.",
   "author": { "name": "giginet" },
   "homepage": "https://github.com/giginet/apple-icon-composer-skill",

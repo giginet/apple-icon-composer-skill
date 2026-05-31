@@ -1,6 +1,6 @@
 [project]
 name = "icon-composer"
-version = "0.1.0"
+version = "1.1.0"
 description = "CLI tools for creating and validating Apple Icon Composer .icon packages."
 requires-python = ">=3.9"
 dependencies = [

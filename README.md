@@ -5,7 +5,7 @@
 [![Codex](https://img.shields.io/badge/Codex-plugin-10A37F?logo=openai&logoColor=white)](#codex)
 [![gh skill](https://img.shields.io/badge/gh_skill-install-1F2328?logo=github&logoColor=white)](#github-cli-gh-skill)
 
-The **icon-composer** plugin — tools to create and validate Apple [Icon Composer](https://developer.apple.com/icon-composer/) `.icon` packages. The same package installs three ways: as a [Claude Code plugin](https://docs.claude.com/en/docs/claude-code/plugins), a [Codex plugin](https://developers.openai.com/codex/plugins), or a standalone skill via [`gh skill`](https://cli.github.com/manual/gh_skill_install).
+The **icon-composer** plugin — tools to create, validate, and render Apple [Icon Composer](https://developer.apple.com/icon-composer/) `.icon` packages. The same package installs three ways: as a [Claude Code plugin](https://docs.claude.com/en/docs/claude-code/plugins), a [Codex plugin](https://developers.openai.com/codex/plugins), or a standalone skill via [`gh skill`](https://cli.github.com/manual/gh_skill_install).
 
 ## Install
 
@@ -47,14 +47,15 @@ The skill is self-contained: its `scripts/` directory is a `uv` project bundling
 
 ## Skill
 
-One skill, `compose-app-icon`, covers both authoring and validation:
+One skill, `compose-app-icon`, covers authoring, validation, and rendering:
 
 | Triggers on | What it does |
 |---|---|
 | "make an icon", "change the icon's dark-mode color", authoring or editing any `icon.json` property | Creates a fresh `.icon` via the bundled `create_icon.py` CLI, or edits an existing `icon.json` in place and re-validates. Covers all schema categories — fills, blend modes, shadows, translucency, LiquidGlass, layouts, specializations. |
 | "check this icon", "why won't Icon Composer open this" | Runs `jsonschema` against `icon.json` via `validate_icon.py`, cross-checks referenced assets against `Assets/` on disk, and explains failures in terms of the schema. |
+| "render this icon", "show me the dark/tinted variant", "does Icon Composer actually open this" | On macOS with Xcode, renders any platform/appearance to a PNG with `ictool` (bundled in `Icon Composer.app`, located via `xcode-select -p`). A failed render is the ground-truth signal that Icon Composer can't open the package — catching engine-level issues the schema can't, like the scale-only `position` bug. |
 
-The skill shells out to two small Python CLIs bundled in its `scripts/` directory (a [uv](https://docs.astral.sh/uv/) project). Its preflight stops with an error if `uv` is not on `PATH`.
+The skill shells out to two small Python CLIs bundled in its `scripts/` directory (a [uv](https://docs.astral.sh/uv/) project); its preflight stops with an error if `uv` is not on `PATH`. The optional `ictool` rendering/ground-truth step needs macOS with Xcode (Icon Composer 1.5+) and is skipped elsewhere — `validate_icon.py` is the portable check.
 
 ## Repo layout
 

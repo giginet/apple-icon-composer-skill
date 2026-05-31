@@ -1,6 +1,6 @@
 {
   "name": "icon-composer",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Create and validate Apple Icon Composer .icon packages.",
   "license": "Apache-2.0"
 }

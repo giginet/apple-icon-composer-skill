@@ -21,6 +21,22 @@ The marketplace is named `icon-composer` in `.claude-plugin/marketplace.json`; t
 
 Run `/reload-plugins` once so Claude Code picks up the new skills. You can confirm they are active by typing `/` and looking for `/icon-composer:authoring` and `/icon-composer:validate` in the list.
 
+### With the GitHub CLI (`gh skill`)
+
+The skills are also published at the top-level `skills/` directory, so they can be installed directly with [`gh skill`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+):
+
+```sh
+# Browse and pick interactively
+gh skill install giginet/icon-composer-agent-skill
+
+# Or install a specific skill for Claude Code
+gh skill install giginet/icon-composer-agent-skill authoring --agent claude-code
+gh skill install giginet/icon-composer-agent-skill validate --agent claude-code
+```
+
+> [!NOTE]
+> `gh skill` copies only the skill directory (`SKILL.md`). The bundled Python CLIs (`create_icon.py`, `validate_icon.py`) and `icon-schema.json` live at the plugin root and are referenced via `${CLAUDE_PLUGIN_ROOT}`, so the full create/validate workflow still requires the plugin install above. Use `gh skill` when you want the skill instructions on a non-marketplace agent host.
+
 ## Skills
 
 Once installed, two skills are available:
@@ -38,12 +54,13 @@ Both skills shell out to small Python CLIs bundled with the plugin and managed w
 .
 ├── .claude-plugin/
 │   └── marketplace.json                 marketplace index (points at plugins/)
+├── skills/                              canonical skill sources (top-level for `gh skill install`)
+│   ├── authoring/SKILL.md
+│   └── validate/SKILL.md
 ├── plugins/
 │   └── icon-composer/
 │       ├── .claude-plugin/plugin.json
-│       ├── skills/
-│       │   ├── authoring/SKILL.md
-│       │   └── validate/SKILL.md
+│       ├── skills -> ../../skills       symlink so Claude Code loads the same skills
 │       ├── scripts/
 │       │   ├── create_icon.py
 │       │   └── validate_icon.py

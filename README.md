@@ -8,12 +8,12 @@ A personal [Claude Code plugin marketplace](https://docs.claude.com/en/docs/clau
 
 ## Install
 
-This repo is published at <https://github.com/giginet/icon-composer-agent-skill>. It can be installed as a Claude Code plugin, a Codex plugin, or a standalone skill via the GitHub CLI — see the sections below.
+This repo is published at <https://github.com/giginet/apple-icon-composer-skill>. It can be installed as a Claude Code plugin, a Codex plugin, or a standalone skill via the GitHub CLI — see the sections below.
 
 ### From GitHub
 
 ```
-/plugin marketplace add giginet/icon-composer-agent-skill
+/plugin marketplace add giginet/apple-icon-composer-skill
 /plugin install icon-composer@icon-composer
 ```
 
@@ -30,7 +30,7 @@ Run `/reload-plugins` once so Claude Code picks up the new skills. You can confi
 The same plugin is exposed to [Codex](https://developers.openai.com/codex/plugins) through a repo marketplace at `.agents/plugins/marketplace.json` (manifest at `plugins/icon-composer/.codex-plugin/plugin.json`):
 
 ```sh
-codex plugin marketplace add giginet/icon-composer-agent-skill
+codex plugin marketplace add giginet/apple-icon-composer-skill
 # then open the plugin directory in Codex, pick the "Icon Composer" marketplace, and install
 ```
 
@@ -42,11 +42,11 @@ The skills can also be installed directly with [`gh skill`](https://cli.github.c
 
 ```sh
 # Browse and pick interactively
-gh skill install giginet/icon-composer-agent-skill
+gh skill install giginet/apple-icon-composer-skill
 
 # Or install a specific skill for Claude Code
-gh skill install giginet/icon-composer-agent-skill authoring --agent claude-code
-gh skill install giginet/icon-composer-agent-skill validate --agent claude-code
+gh skill install giginet/apple-icon-composer-skill authoring --agent claude-code
+gh skill install giginet/apple-icon-composer-skill validate --agent claude-code
 ```
 
 > [!NOTE]

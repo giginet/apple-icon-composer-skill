@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Create and validate Apple Icon Composer .icon packages.",
   "author": { "name": "giginet" },
-  "homepage": "https://github.com/giginet/icon-composer-agent-skill",
-  "repository": "https://github.com/giginet/icon-composer-agent-skill",
+  "homepage": "https://github.com/giginet/apple-icon-composer-skill",
+  "repository": "https://github.com/giginet/apple-icon-composer-skill",
   "keywords": ["icon", "apple", "icon-composer", "macos", "appicon"],
   "skills": "./skills/",
   "interface": {

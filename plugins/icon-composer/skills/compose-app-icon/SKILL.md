@@ -228,6 +228,13 @@ A group shares the same LiquidGlass rendering pipeline across its layers and car
 
 Color strings are `<colorspace>:<comp1>,<comp2>,...`. Common spaces: `extended-srgb`, `display-p3`, `extended-gray`.
 
+A `linear-gradient` may carry an optional sibling `orientation` — the gradient's direction as normalized start/stop points (0–1 on each axis). Icon Composer writes it when you rotate a gradient; it is only valid alongside `linear-gradient`. Omit it for the default direction.
+
+```jsonc
+{ "linear-gradient": ["display-p3:1,1,1,1", "srgb:0.81,0.88,1,1"],
+  "orientation": { "start": { "x": 0.5, "y": 0 }, "stop": { "x": 0.5, "y": 0.7 } } }
+```
+
 ## Specializations — per-appearance overrides
 
 Icon Composer supports three appearances: **light** (default), **dark**, **tinted**. Any specializable property `X` has an optional sibling array `X-specializations`:

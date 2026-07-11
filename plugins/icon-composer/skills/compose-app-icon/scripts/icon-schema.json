@@ -55,6 +55,26 @@
       "description": "Literal 'automatic' — means inherit the default appearance's value automatically",
       "enum": ["automatic"]
     },
+    "gradient-point": {
+      "type": "object",
+      "description": "A normalized point (0 to 1 on each axis) on the icon canvas, used for gradient endpoints",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": false
+    },
+    "gradient-orientation": {
+      "type": "object",
+      "description": "Start and stop points defining a linear gradient's direction. Icon Composer emits this alongside 'linear-gradient' when the gradient is rotated.",
+      "properties": {
+        "start": { "$ref": "#/$defs/gradient-point" },
+        "stop": { "$ref": "#/$defs/gradient-point" }
+      },
+      "required": ["start", "stop"],
+      "additionalProperties": false
+    },
     "fill": {
       "type": "object",
       "description": "A fill definition. Exactly one of the fill type properties should be present.",
@@ -73,12 +93,22 @@
           "items": { "$ref": "#/$defs/color" },
           "minItems": 2,
           "maxItems": 2
+        },
+        "orientation": {
+          "$ref": "#/$defs/gradient-orientation",
+          "description": "Direction of a 'linear-gradient' fill, as start/stop points. Only valid alongside 'linear-gradient'."
         }
       },
       "oneOf": [
         { "required": ["automatic-gradient"] },
         { "required": ["solid"] },
         { "required": ["linear-gradient"] }
+      ],
+      "allOf": [
+        {
+          "if": { "not": { "required": ["linear-gradient"] } },
+          "then": { "not": { "required": ["orientation"] } }
+        }
       ],
       "additionalProperties": false
     },

@@ -214,3 +214,60 @@ def test_orphaned_assets_emit_warning(
     assert exit_code == 0
     assert "warning" in out
     assert "unused.png" in out
+
+
+_LINEAR_GRADIENT = [
+    "display-p3:1.00000,1.00000,1.00000,1.00000",
+    "srgb:0.80000,0.88000,1.00000,1.00000",
+]
+
+
+def _icon_with_background_fill(tmp_path: Path, fill: dict) -> Path:
+    """Write a minimal valid .icon whose top-level background carries the given fill."""
+    pkg = tmp_path / "filled.icon"
+    (pkg / "Assets").mkdir(parents=True)
+    (pkg / "Assets" / "symbol.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+    (pkg / "icon.json").write_text(
+        json.dumps(
+            {
+                "fill": fill,
+                "groups": [
+                    {
+                        "layers": [{"name": "symbol", "image-name": "symbol.png"}],
+                        "shadow": {"kind": "neutral", "opacity": 0.5},
+                        "translucency": {"enabled": True, "value": 0.5},
+                    }
+                ],
+                "supported-platforms": {"squares": "shared"},
+            }
+        )
+    )
+    return pkg
+
+
+def test_linear_gradient_with_orientation_valid(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Icon Composer writes an 'orientation' (start/stop points) next to a rotated
+    # linear-gradient, so the schema must accept it.
+    fill = {
+        "linear-gradient": _LINEAR_GRADIENT,
+        "orientation": {"start": {"x": 0.5, "y": 0}, "stop": {"x": 0.5, "y": 0.7}},
+    }
+    exit_code = main([str(_icon_with_background_fill(tmp_path, fill))])
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_orientation_without_linear_gradient_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # 'orientation' is only meaningful alongside a linear-gradient.
+    fill = {
+        "solid": "srgb:0.50000,0.50000,0.50000,1.00000",
+        "orientation": {"start": {"x": 0.5, "y": 0}, "stop": {"x": 0.5, "y": 0.7}},
+    }
+    exit_code = main([str(_icon_with_background_fill(tmp_path, fill))])
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "INVALID" in out

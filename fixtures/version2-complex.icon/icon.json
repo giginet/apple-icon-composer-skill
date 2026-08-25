@@ -1,0 +1,100 @@
+{
+  "features" : [
+    "refractivity"
+  ],
+  "fill-specializations" : [
+    {
+      "value" : {
+        "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+      }
+    },
+    {
+      "appearance" : "dark",
+      "value" : "automatic"
+    }
+  ],
+  "groups" : [
+    {
+      "blur-material" : 0.5,
+      "layers" : [
+        {
+          "glass" : true,
+          "image-name-specializations" : [
+            {
+              "value" : "layer3-symbol-light.png"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "layer3-symbol-dark.png"
+            }
+          ],
+          "name" : "layer3-symbol-dark"
+        },
+        {
+          "glass" : true,
+          "image-name-specializations" : [
+            {
+              "value" : "layer2-ball-light.png"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "layer2-ball-dark.png"
+            }
+          ],
+          "name" : "layer2-ball-dark"
+        },
+        {
+          "glass" : false,
+          "image-name-specializations" : [
+            {
+              "value" : "layer1-shadow-light.png"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "layer1-shadow-dark.png"
+            }
+          ],
+          "name" : "layer1-shadow-dark"
+        },
+        {
+          "hidden-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : true
+            }
+          ],
+          "image-name" : "layer0-background-light.png",
+          "name" : "layer0-background-light"
+        }
+      ],
+      "lighting" : "individual",
+      "refractivity" : {
+        "depth" : 0.6110546875,
+        "enabled" : true,
+        "strength" : 0.577109375
+      },
+      "shadow-specializations" : [
+        {
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 0.5
+          }
+        },
+        {
+          "appearance" : "light",
+          "value" : {
+            "kind" : "layer-color",
+            "opacity" : 0.5
+          }
+        }
+      ],
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

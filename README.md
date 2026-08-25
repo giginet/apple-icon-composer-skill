@@ -51,11 +51,11 @@ One skill, `compose-app-icon`, covers authoring, validation, and rendering:
 
 | Triggers on | What it does |
 |---|---|
-| "make an icon", "change the icon's dark-mode color", authoring or editing any `icon.json` property | Creates a fresh `.icon` via the bundled `create_icon.py` CLI, or edits an existing `icon.json` in place and re-validates. Covers all schema categories — fills, blend modes, shadows, translucency, LiquidGlass, layouts, specializations. |
+| "make an icon", "change the icon's dark-mode color", authoring or editing any `icon.json` property | Creates a fresh `.icon` via the bundled `create_icon.py` CLI, or edits an existing `icon.json` in place and re-validates. Covers all schema categories — fills, blend modes, shadows, translucency, Liquid Glass (Mode/Specular/Blur Material/Refractivity), RTL asset mirroring, layouts, specializations. |
 | "check this icon", "why won't Icon Composer open this" | Runs `jsonschema` against `icon.json` via `validate_icon.py`, cross-checks referenced assets against `Assets/` on disk, and explains failures in terms of the schema. |
 | "render this icon", "show me the dark/tinted variant", "does Icon Composer actually open this" | On macOS with Xcode, renders any platform/appearance to a PNG with `ictool` (bundled in `Icon Composer.app`, located via `xcode-select -p`). A failed render is the ground-truth signal that Icon Composer can't open the package — catching engine-level issues the schema can't, like the scale-only `position` bug. |
 
-The skill shells out to two small Python CLIs bundled in its `scripts/` directory (a [uv](https://docs.astral.sh/uv/) project); its preflight stops with an error if `uv` is not on `PATH`. The optional `ictool` rendering/ground-truth step needs macOS with Xcode (Icon Composer 1.5+) and is skipped elsewhere — `validate_icon.py` is the portable check.
+The skill shells out to two small Python CLIs bundled in its `scripts/` directory (a [uv](https://docs.astral.sh/uv/) project); its preflight stops with an error if `uv` is not on `PATH`. The optional `ictool` rendering/ground-truth step needs macOS with Xcode (Icon Composer 1.5+; 2.0 for the Icon Composer 2 keys) and is skipped elsewhere — `validate_icon.py` is the portable check.
 
 ## Repo layout
 
@@ -110,4 +110,4 @@ uv run python create_icon.py \
 uv run python validate_icon.py /tmp/smoke.icon
 ```
 
-`icon-schema.json` is the authoritative definition of the `icon.json` format — including per-appearance `-specializations` overrides, the LiquidGlass property set on groups, and the enum values Icon Composer's UI labels quietly map to (for example, Shadow `"Natural"` → `"neutral"`, `"Chromatic"` → `"layer-color"`).
+`icon-schema.json` is the authoritative definition of the `icon.json` format for both Icon Composer 1.x and 2.x — including per-slot `-specializations` overrides (appearance, idiom, localization), the Liquid Glass property set on groups (`lighting`, `specular`, `blur-material`, `refractivity`, `translucency`, `shadow`), the document `features` gate Icon Composer 2 writes, and the enum values Icon Composer's UI labels quietly map to (for example, Shadow `"Natural"` → `"neutral"`, `"Chromatic"` → `"layer-color"`).

@@ -21,6 +21,7 @@ FIXTURES = REPO_ROOT / "fixtures"
         "complex-icon",
         "test-generated",
         "scaled-layer",
+        "version2-complex",
     ],
 )
 def test_fixtures_are_valid(name: str, capsys: pytest.CaptureFixture[str]) -> None:
@@ -271,3 +272,295 @@ def test_orientation_without_linear_gradient_rejected(
     out = capsys.readouterr().out
     assert exit_code == 1
     assert "INVALID" in out
+
+
+# --- Icon Composer 2 ------------------------------------------------------
+
+
+def _icon_with_group(tmp_path: Path, group_extra: dict, **doc_extra: object) -> Path:
+    """Write a minimal .icon whose single group carries the given extra keys."""
+    pkg = tmp_path / "v2.icon"
+    (pkg / "Assets").mkdir(parents=True)
+    (pkg / "Assets" / "symbol.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+    group: dict = {"layers": [{"name": "symbol", "image-name": "symbol.png"}]}
+    group.update(group_extra)
+    (pkg / "icon.json").write_text(
+        json.dumps(
+            {
+                "groups": [group],
+                "supported-platforms": {"squares": "shared"},
+                **doc_extra,
+            }
+        )
+    )
+    return pkg
+
+
+_REFRACTIVITY = {"enabled": True, "strength": 0.5, "depth": 0.6}
+
+
+def test_group_without_shadow_or_translucency_valid(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Icon Composer 2 omits 'shadow' entirely when the group specializes it,
+    # so neither key may be required on a group.
+    exit_code = main([str(_icon_with_group(tmp_path, {}))])
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_blur_material_valid(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main([str(_icon_with_group(tmp_path, {"blur-material": 0.5}))])
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_blur_material_out_of_range_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main([str(_icon_with_group(tmp_path, {"blur-material": 1.5}))])
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "blur-material" in out
+
+
+def test_refractivity_requires_all_three_keys(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # ictool refuses a refractivity object missing 'strength' or 'depth'.
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {"refractivity": {"enabled": True}},
+                    features=["refractivity"],
+                )
+            )
+        ]
+    )
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "strength" in out
+
+
+def test_refractivity_requires_feature_declaration(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Icon Composer 2 always writes features: ["refractivity"] alongside the key,
+    # so that Icon Composer 1.x refuses the document instead of dropping the effect.
+    exit_code = main([str(_icon_with_group(tmp_path, {"refractivity": _REFRACTIVITY}))])
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "features" in out
+
+
+def test_refractivity_with_feature_valid(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {"refractivity": _REFRACTIVITY},
+                    features=["refractivity"],
+                )
+            )
+        ]
+    )
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_unknown_feature_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main([str(_icon_with_group(tmp_path, {}, features=["translucency"]))])
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "features" in out
+
+
+def test_specular_highlight_placement_requires_feature(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [str(_icon_with_group(tmp_path, {"specular-highlight-placement": "inside"}))]
+    )
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "features" in out
+
+
+def test_specular_highlight_placement_with_feature_valid(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {"specular-highlight-placement": "inside"},
+                    features=["specular-location"],
+                )
+            )
+        ]
+    )
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_shadow_specializations_take_whole_objects(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {
+                        "shadow-specializations": [
+                            {"value": {"kind": "neutral", "opacity": 0.5}},
+                            {
+                                "appearance": "dark",
+                                "value": {"kind": "layer-color", "opacity": 0.4},
+                            },
+                        ]
+                    },
+                )
+            )
+        ]
+    )
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_nested_shadow_kind_specializations_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Icon Composer has no nested 'shadow.kind-specializations'; the whole shadow
+    # object is specialized through the group's 'shadow-specializations'.
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {
+                        "shadow": {
+                            "kind": "neutral",
+                            "opacity": 0.5,
+                            "kind-specializations": [
+                                {"appearance": "dark", "value": "none"}
+                            ],
+                        }
+                    },
+                )
+            )
+        ]
+    )
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "kind-specializations" in out
+
+
+def test_specialization_slot_accepts_idiom_and_localization(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {
+                        "shadow-specializations": [
+                            {
+                                "idiom": "watchOS",
+                                "localization": "ja",
+                                "value": {"kind": "none", "opacity": 0.5},
+                            }
+                        ]
+                    },
+                )
+            )
+        ]
+    )
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_specialization_slot_rejects_unknown_idiom(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [
+            str(
+                _icon_with_group(
+                    tmp_path,
+                    {
+                        "shadow-specializations": [
+                            {
+                                "idiom": "visionOS",
+                                "value": {"kind": "none", "opacity": 0.5},
+                            }
+                        ]
+                    },
+                )
+            )
+        ]
+    )
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "visionOS" in out
+
+
+def test_asset_mirroring_is_an_object(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [str(_icon_with_group(tmp_path, {"asset-mirroring": {"mirrorable": False}}))]
+    )
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_named_system_color_valid(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(
+        [str(_icon_with_background_fill(tmp_path, {"solid": "named:system-blue"}))]
+    )
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out
+
+
+def test_rgb_color_needs_four_components(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # ictool: 'Expected four comma separated color components'.
+    exit_code = main(
+        [str(_icon_with_background_fill(tmp_path, {"solid": "srgb:0.5,0.5,1.0"}))]
+    )
+    out = capsys.readouterr().out
+    assert exit_code == 1
+    assert "INVALID" in out
+
+
+def test_fill_keyword_valid(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    pkg = tmp_path / "keyword.icon"
+    (pkg / "Assets").mkdir(parents=True)
+    (pkg / "Assets" / "symbol.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+    (pkg / "icon.json").write_text(
+        json.dumps(
+            {
+                "fill": "system-dark",
+                "groups": [{"layers": [{"name": "s", "image-name": "symbol.png"}]}],
+                "supported-platforms": {"squares": "shared"},
+            }
+        )
+    )
+    exit_code = main([str(pkg)])
+    assert exit_code == 0
+    assert "VALID" in capsys.readouterr().out

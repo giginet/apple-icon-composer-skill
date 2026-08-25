@@ -193,3 +193,90 @@ def test_no_validate_skips_schema_check(tmp_path: Path) -> None:
         ]
     )
     assert exit_code == 0
+
+
+def test_creates_icon_composer_2_document(tmp_path: Path) -> None:
+    # A group carrying the Icon Composer 2 Liquid Glass keys must survive
+    # schema validation and land on disk verbatim.
+    src = tmp_path / "symbol.png"
+    src.write_bytes(b"\x89PNG\r\n\x1a\n")
+    icon = tmp_path / "icon.json"
+    icon.write_text(
+        json.dumps(
+            {
+                "features": ["refractivity"],
+                "groups": [
+                    {
+                        "blur-material": 0.5,
+                        "layers": [{"name": "symbol", "image-name": "symbol.png"}],
+                        "refractivity": {
+                            "enabled": True,
+                            "strength": 0.58,
+                            "depth": 0.61,
+                        },
+                        "shadow-specializations": [
+                            {"value": {"kind": "neutral", "opacity": 0.5}},
+                            {
+                                "appearance": "dark",
+                                "value": {"kind": "layer-color", "opacity": 0.5},
+                            },
+                        ],
+                        "translucency": {"enabled": True, "value": 0.5},
+                    }
+                ],
+                "supported-platforms": {"squares": "shared"},
+            }
+        )
+    )
+    output = tmp_path / "v2.icon"
+    exit_code = main(
+        [
+            "--output",
+            str(output),
+            "--icon",
+            str(icon),
+            "--asset",
+            f"symbol.png={src}",
+        ]
+    )
+    assert exit_code == 0
+    written = json.loads((output / "icon.json").read_text())
+    assert written["features"] == ["refractivity"]
+    assert written["groups"][0]["refractivity"]["depth"] == 0.61
+
+
+def test_refractivity_without_feature_declaration_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    src = tmp_path / "symbol.png"
+    src.write_bytes(b"\x89PNG\r\n\x1a\n")
+    icon = tmp_path / "icon.json"
+    icon.write_text(
+        json.dumps(
+            {
+                "groups": [
+                    {
+                        "layers": [{"name": "symbol", "image-name": "symbol.png"}],
+                        "refractivity": {
+                            "enabled": True,
+                            "strength": 0.58,
+                            "depth": 0.61,
+                        },
+                    }
+                ],
+                "supported-platforms": {"squares": "shared"},
+            }
+        )
+    )
+    exit_code = main(
+        [
+            "--output",
+            str(tmp_path / "v2.icon"),
+            "--icon",
+            str(icon),
+            "--asset",
+            f"symbol.png={src}",
+        ]
+    )
+    assert exit_code == 1
+    assert "features" in capsys.readouterr().err

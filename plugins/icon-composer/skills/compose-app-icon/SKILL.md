@@ -205,7 +205,7 @@ Icon Composer's design canvas is **1024 × 1024 points**. Image assets should be
   "fill-specializations": [ ... ],                        // per-slot background fill
   "implicit-asset-mirroring": true,                       // IC2: mirror assets for RTL languages
   "languages": ["ja", "ar"],                              // IC2: locale IDs with localized assets
-  "groups": [ ... ],                                      // REQUIRED: ordered layer groups
+  "groups": [ ... ],                                      // REQUIRED: layer groups, front→back (first renders topmost)
   "supported-platforms": { "squares": "shared" }          // REQUIRED
 }
 ```
@@ -216,7 +216,7 @@ A group shares the same Liquid Glass rendering pipeline across its layers. `laye
 
 | JSON key | Type | UI label | Notes |
 |---|---|---|---|
-| `layers` | array | — | **Required**, at least one layer. |
+| `layers` | array | — | **Required**, at least one layer; ordered front→back like `groups` (first paints on top). |
 | `name` | string | — | Display name of the group. |
 | `lighting` | `"individual"` \| `"combined"` | **Mode** | How light interacts per-layer or across the group. |
 | `specular` | boolean | **Specular** | Highlight on/off. |

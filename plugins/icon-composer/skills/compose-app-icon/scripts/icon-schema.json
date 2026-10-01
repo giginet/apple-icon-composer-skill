@@ -33,7 +33,7 @@
     },
     "groups": {
       "type": "array",
-      "description": "Ordered list of layer groups composing the icon",
+      "description": "Ordered list of layer groups composing the icon, front to back — the first group renders topmost",
       "items": {
         "$ref": "#/$defs/group"
       }
@@ -524,7 +524,7 @@
         },
         "layers": {
           "type": "array",
-          "description": "Ordered list of layers in this group",
+          "description": "Ordered list of layers in this group, front to back — the first layer renders on top",
           "items": { "$ref": "#/$defs/layer" },
           "minItems": 1
         },
